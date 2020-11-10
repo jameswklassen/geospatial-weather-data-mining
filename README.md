@@ -12,6 +12,8 @@ Tyler Loewen ([loewent4@myumanitoba.ca](mailto:loewent4@myumanitoba.ca))
 - [Project Outline](#Project-Outline)
 - [Schedule](#Schedule)
 - [Resources](#Resources)
+- [Datasets](#Datasets)
+- [Process](#Process)
 - [Algorithm](#Algorithm)
 
 ## Deliverables
@@ -35,15 +37,17 @@ Tyler Loewen ([loewent4@myumanitoba.ca](mailto:loewent4@myumanitoba.ca))
 
 ### Week 0 (Nov 6)
 
-- [ ] Initial meeting
-- [ ] Decide rough project idea
+- [x] Initial meeting
+- [x] Decide rough project idea
 
 ### Week 1 (Nov 13)
 
-- [ ] What data do we want to pull?
-- [ ] Determine how to get data from AWS into a usable format
-- [ ] Selected a visualization tool 
-- [ ] Git repo with contributions (James)
+- [x] What data do we want to pull?
+- [x] Determine how to get data from AWS into a usable format
+- [ ] Selected a visualization tool
+- [x] Git repo with contributions (James)
+- [ ] Basic jagged array indexing and parsing
+- [ ] Basic data filtering and agglomerating
 
 ### Week 2 (Nov 20)
 
@@ -68,28 +72,36 @@ Tyler Loewen ([loewent4@myumanitoba.ca](mailto:loewent4@myumanitoba.ca))
 - [World Ocean Database: code tables](https://www.nodc.noaa.gov/OC5/WOD/wod_codes.html)
   - [Acronyms](https://www.ncei.noaa.gov/access/world-ocean-database-select/bin/builder.pl)
 
-### Maps in python:
+### Maps in python
 
 - https://www.youtube.com/watch?v=6GGcEoodLNM
 - https://www.youtube.com/watch?v=hA39KSTb3dY
 
-Data Available we want to use?
+## Datasets
 
-- Water Temperature
+We are using [NOAA](https://www.nodc.noaa.gov/OC5/WOD/pr_wod.html) datasets with the following ocean information:
+
+- Temperature
 - Salinity
+- Oxygen
+
+One dataset contains data points from the entire year of 2005.
+The other dataset contains data points from the entire year of 2019.
+
+## Process
 
 Fixed time interval dataset using clustering methods and represented using Data Visualization:
 
-- Cluster water temperature and salinity data into distinct clusters and visually represent them on a map (using coloured regions)
+- Cluster water temperature, salinity, and oxygen data into distinct clusters and visually represent them on a map (using coloured regions)
   - Clusters could be represented as a geographical region
-  - User specify how many different clusters of temperature they want represented then data clustered appropriately
-  - Change saturation of colour based on salinity value
+  - User specify how many different clusters of variables they want represented then data clustered appropriately
+  - Change saturation of colour based on salinity/oxygen value, etc
 
 ## Algorithm
 
 Clustering algorithm idea:
 
 - Determine min/max range
-- Input # of desired clusters, evenly split the clusters among that range in the form of temperature ranges
+- Input number of desired clusters, evenly split the clusters among that range in the form of temperature ranges
 - Adjust the groups one by one until they’re all roughly even, same # of points or same geographical area
-- Plot them w/ different colours on a map projection
+- Plot them with different colours on a map projection

@@ -68,9 +68,14 @@ Tyler Loewen ([loewent4@myumanitoba.ca](mailto:loewent4@myumanitoba.ca))
 - [AWS Information page](https://registry.opendata.aws/noaa-wod/)
 - [AWS Dataset](https://noaa-wod-pds.s3.amazonaws.com/index.html)
 - [NOAA Website](https://www.nodc.noaa.gov/OC5/WOD/pr_wod.html)
-- [High resolution water surface temperature](https://podaac.jpl.nasa.gov/dataset/MUR-JPL-L4-GLOB-v4.1)
 - [World Ocean Database: code tables](https://www.nodc.noaa.gov/OC5/WOD/wod_codes.html)
   - [Acronyms](https://www.ncei.noaa.gov/access/world-ocean-database-select/bin/builder.pl)
+- [NASA High resolution water surface temperature](https://podaac.jpl.nasa.gov/dataset/MUR-JPL-L4-GLOB-v4.1)
+
+### Examples
+
+- [netCDF4 Python docs](https://unidata.github.io/netcdf4-python/netCDF4/)
+- [Working with netCDF4: Example](https://www.earthinversion.com/utilities/reading-NetCDF4-data-in-python/)
 
 ### Maps in python
 

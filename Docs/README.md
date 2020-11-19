@@ -12,7 +12,7 @@ Tyler Loewen ([loewent4@myumanitoba.ca](mailto:loewent4@myumanitoba.ca))
 - [Project Outline](#Project-Outline)
 - [Schedule](#Schedule)
 - [Resources](#Resources)
-- [Datasets](#Datasets)
+- [Dataset](#Dataset)
 - [Process](#Process)
 - [Algorithm](#Algorithm)
 

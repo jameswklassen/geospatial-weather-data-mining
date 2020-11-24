@@ -1,5 +1,12 @@
 from netCDF4 import Dataset
 import numpy as np
+import json
+
+def mean(var, lat, lon, howmany):
+    mean = np.mean(var[0,lat:lat+howmany, lon:lon+howmany])
+
+    # Workaround for masked values - might need a better solution in the future
+    return -32767 if np.ma.is_masked(mean) else mean
 
 filename = 'EAR5-01-01-2020.nc'
 
@@ -39,39 +46,21 @@ for curr_lat in range(TOTAL_LAT):
             break
         count += 1
 
-        # Store the averages
-        all_land_sea_mask = []
-        all_ten_metre_U_wind_component = []
-        all_ten_metre_V_wind_component = []
-        all_two_metre_temperature = []
-        all_mean_sea_level_pressure = []
-        all_mean_wave_direction = []
-        all_sea_surface_temperature = []
-        all_total_cloud_cover = []
-
-        for lat_slice in range(NUM_SLICES):
-            for lon_slice in range(NUM_SLICES):
-                all_land_sea_mask.append(land_sea_mask[0, lat[lat_slice], lon[lon_slice]])
-                all_ten_metre_U_wind_component.append(ten_metre_U_wind_component[0, lat[lat_slice], lon[lon_slice]])
-                all_ten_metre_V_wind_component.append(ten_metre_V_wind_component[0, lat[lat_slice], lon[lon_slice]])
-                all_two_metre_temperature.append(two_metre_temperature[0, lat[lat_slice], lon[lon_slice]] - KELVIN)
-                all_mean_sea_level_pressure.append(mean_sea_level_pressure[0, lat[lat_slice], lon[lon_slice]])
-                all_mean_wave_direction.append(mean_wave_direction[0, lat[lat_slice], lon[lon_slice]])
-                all_sea_surface_temperature.append(sea_surface_temperature[0, lat[lat_slice], lon[lon_slice]] - KELVIN)
-                all_total_cloud_cover.append(total_cloud_cover[0, lat[lat_slice], lon[lon_slice]])
-
         coordinates[curr_lat][curr_lon] = {
             'lat': curr_lat,
             'lon': curr_lon,
-            'sea_surface_temperature': np.mean(all_sea_surface_temperature),
-            'land_sea_mask': np.mean(all_land_sea_mask),
-            'ten_metre_U_wind_component': np.mean(all_ten_metre_U_wind_component),
-            'ten_metre_V_wind_component': np.mean(all_ten_metre_V_wind_component),
-            'two_metre_temperature': np.mean(all_two_metre_temperature),
-            'mean_sea_level_pressure': np.mean(all_mean_sea_level_pressure),
-            'mean_wave_direction': np.mean(all_mean_wave_direction),
-            'sea_surface_temperature': np.mean(all_sea_surface_temperature),
-            'total_cloud_cover': np.mean(all_total_cloud_cover),
+            'land_sea_mask': mean(land_sea_mask, curr_lat, curr_lon, NUM_SLICES),
+            'ten_metre_U_wind_component': mean(ten_metre_U_wind_component, curr_lat, curr_lon, NUM_SLICES),
+            'ten_metre_V_wind_component': mean(ten_metre_V_wind_component, curr_lat, curr_lon, NUM_SLICES),
+            'two_metre_temperature': mean(two_metre_temperature, curr_lat, curr_lon, NUM_SLICES),
+            'mean_sea_level_pressure': mean(mean_sea_level_pressure, curr_lat, curr_lon, NUM_SLICES),
+            'mean_wave_direction': mean(mean_wave_direction, curr_lat, curr_lon, NUM_SLICES),
+            'sea_surface_temperature': mean(sea_surface_temperature, curr_lat, curr_lon, NUM_SLICES),
+            'total_cloud_cover': mean(total_cloud_cover, curr_lat, curr_lon, NUM_SLICES),
         }
 
-print(coordinates)
+print(coordinates[0])
+
+# Save it once we're done processing
+with open('converted_data.json', 'w') as outfile:
+    json.dump(coordinates, outfile)    

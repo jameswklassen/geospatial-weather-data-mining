@@ -3,10 +3,6 @@ import numpy as np
 import json
 import multiprocessing as mp
 
-filename = 'EAR5-01-01-2020.nc'
-
-ctd = Dataset(filename, 'r')
-
 KELVIN = 271
 TOTAL_LAT = 180
 TOTAL_LON = 360
@@ -21,10 +17,10 @@ def mean(var, lat, lon, howmany):
 
 def process_data(lat_start, lat_end):
     print(f"start: {lat_start} end: {lat_end}")
-
-    TOTAL_LAT = 180
-    TOTAL_LON = 360
     coordinates = [['-']*TOTAL_LON for _ in range(TOTAL_LAT)]
+
+    filename = 'EAR5-01-01-2020.nc'
+    ctd = Dataset(filename, 'r')
 
     land_sea_mask = ctd.variables['lsm']
     ten_metre_U_wind_component = ctd.variables['u10']
@@ -54,7 +50,7 @@ def process_data(lat_start, lat_end):
 pool = mp.Pool(mp.cpu_count())
 
 # Pool.starmap is multithreading magic
-results = pool.starmap(process_data, [(i*10, (i+1)*10) for i in range(18)])
+results = pool.starmap(process_data, [(i, i+1) for i in range(TOTAL_LAT)])
 
 coordinates = [['-']*TOTAL_LON for _ in range(TOTAL_LAT)]
 

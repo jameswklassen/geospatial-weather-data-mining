@@ -1,3 +1,12 @@
+# Annoying LaTeX temp files
+*.log
+*.toc
+*.out
+*.aux
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

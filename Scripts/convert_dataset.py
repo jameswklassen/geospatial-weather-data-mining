@@ -20,7 +20,7 @@ variables = [
 ]
 
 def mean(var, lat, lon, howmany):
-    mean = np.mean(var[0,lat:lat+howmany, lon:lon+howmany])
+    mean = np.mean(var[0,(NUM_SLICES*lat):(NUM_SLICES*(lat+howmany)), (NUM_SLICES*lon):(NUM_SLICES*(lon+howmany))])
 
     # Workaround for masked values - might need a better solution in the future
     return None if np.ma.is_masked(mean) else mean
@@ -28,7 +28,7 @@ def mean(var, lat, lon, howmany):
 def process_data(lat_start, lat_end):
     print(f"start: {lat_start} end: {lat_end}")
     
-    coordinates = {variables[i]:[['-']*TOTAL_LON for _ in range(TOTAL_LAT)] for i in range(len(variables))}
+    coordinates = {var:[['-']*TOTAL_LON for _ in range(TOTAL_LAT)] for var in variables}
 
     filename = 'EAR5-01-01-2020.nc'
     ctd = Dataset(filename, 'r')
@@ -68,7 +68,7 @@ pool = mp.Pool(mp.cpu_count())
 # Pool.starmap is multithreading magic
 results = pool.starmap(process_data, [(i, i+10) for i in range(0,TOTAL_LAT,10)])
 
-coordinates = {variables[i]:[['-']*TOTAL_LON for _ in range(TOTAL_LAT)] for i in range(len(variables))}
+coordinates = {var:[['-']*TOTAL_LON for _ in range(TOTAL_LAT)] for var in variables}
 
 # Merge all the partial results and we're done
 for result in results:

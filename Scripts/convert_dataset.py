@@ -78,6 +78,6 @@ for result in results:
                 if result[var][i][j] != '-':
                     coordinates[var][i][j] = result[var][i][j]
 
-# Save it once we're done processing
+# Save the converted data as a json file after processing
 with open('converted_data.json', 'w') as outfile:
     json.dump(coordinates, outfile)

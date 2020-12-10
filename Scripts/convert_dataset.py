@@ -2,6 +2,8 @@ from netCDF4 import Dataset
 import numpy as np
 import json
 
+from consts import INPUT_FILENAME
+
 """
 file: convert_dataset
 
@@ -11,16 +13,12 @@ purpose:
 """
 
 # Processing constants
-KELVIN = 271                # used to convert between Kelvin and Celcius
-TOTAL_LAT = 180             # number of latitude int values on earth
-TOTAL_LON = 360             # number of longitude int values on earth
+
 LAT_LON_PRECISION = 4       # how much the lat/lon variable is divided (i.e. each integer lat/lon has 4 data points)
 
 coordinates = [[0]*TOTAL_LON for _ in range(TOTAL_LAT)]     # 2D array with values for all coordinates
 
-input_filename = 'EAR5-01-01-2020.nc'       # filename containing raw .nc data
-ctd = Dataset(input_filename, 'r')          # Dataset object to interact with
-
+ctd = Dataset(INPUT_FILENAME, 'r')          # Dataset object to interact with
 
 # Pull the variables from the NetCDF file
 lat = ctd.variables['latitude']

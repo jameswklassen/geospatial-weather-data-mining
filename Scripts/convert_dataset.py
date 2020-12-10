@@ -49,7 +49,6 @@ def process_data(lat_start, lat_end):
     ten_metre_V_wind_component = ctd.variables['v10']
     two_metre_temperature = ctd.variables['t2m']
     mean_sea_level_pressure = ctd.variables['msl']
-    mean_wave_direction = ctd.variables['mwd']
     sea_surface_temperature = ctd.variables['sst']
     total_cloud_cover = ctd.variables['tcc']
 
@@ -67,7 +66,6 @@ def process_data(lat_start, lat_end):
                 data['ten_metre_V_wind_component'][lat][lon] = mean(ten_metre_V_wind_component, lat, lon)
                 data['two_metre_temperature'][lat][lon] = mean(two_metre_temperature, lat, lon) - KELVIN
                 data['mean_sea_level_pressure'][lat][lon] = mean(mean_sea_level_pressure, lat, lon) / 1000
-                data['mean_wave_direction'][lat][lon] = mean(mean_wave_direction, lat, lon)
                 data['sea_surface_temperature'][lat][lon] = mean_sea_surface_temperature - KELVIN
                 data['total_cloud_cover'][lat][lon] = mean(total_cloud_cover, lat, lon)
 

@@ -8,7 +8,6 @@ VARIABLES = [
     'ten_metre_V_wind_component',
     'two_metre_temperature',
     'mean_sea_level_pressure',
-    'mean_wave_direction',
     'sea_surface_temperature',
     'total_cloud_cover'
 ]

@@ -21,8 +21,8 @@ CORNER_SMOOTHING = True
 
 ctd = Dataset(INPUT_FILENAME, 'r')          # Dataset object to interact with
 
-lons = list(range(TOTAL_LON))
-lats = list(range(int(TOTAL_LAT/2), int(-TOTAL_LAT/2), -1))
+lons = [i+1.375 for i in range(TOTAL_LON)]
+lats = [i-1.375 for i in range(int(TOTAL_LAT/2), int(-TOTAL_LAT/2), -1)]
 
 
 def save_file(name):

@@ -1,11 +1,14 @@
 import numpy as np
 import json
 import multiprocessing as mp
+import argparse
 from random import randint
 from consts import TOTAL_LAT, TOTAL_LON, VARIABLES
 
 JSON_FILENAME = 'converted_data.json'
-k = 25
+
+def unique_array(arr):
+    return len(arr) == len(set(arr))
 
 # This function breaks ties in the case of there being clusters with identical means.
 def choose_random_duplicate(clustermeans, index, backwards):
@@ -14,7 +17,7 @@ def choose_random_duplicate(clustermeans, index, backwards):
         for i in range(index+1, len(clustermeans)):
             if clustermeans[i] == clustermeans[index]:
                 duplicate_count += 1
-        
+
         # If we have duplicates, randomly choose one to assign the datapoint to
         if duplicate_count > 0:
             return randint(index, index + duplicate_count)
@@ -25,7 +28,7 @@ def choose_random_duplicate(clustermeans, index, backwards):
         for i in range(index-2, -1, -1):
             if clustermeans[i] == clustermeans[index-1]:
                 duplicate_count += 1
-        
+
         # If we have duplicates, randomly choose one to assign the datapoint to
         if duplicate_count > 0:
             return randint(index - duplicate_count - 1, index-1)
@@ -33,14 +36,14 @@ def choose_random_duplicate(clustermeans, index, backwards):
             return index-1
 
 
-def closest_search(datapoint, clustermeans):
+def closest_search_naive(datapoint, clustermeans):
     # Finds the lowest index such that datapoint <= clustermeans[index]
     index = np.searchsorted(clustermeans, datapoint)
 
     # If the index is zero, then it's equal or smaller than the smallest element.
     if index == 0:
         return choose_random_duplicate(clustermeans, index, False)
-    
+
     # If the index is equal to the array length then it's larger than the largest element.
     if index == len(clustermeans):
         return choose_random_duplicate(clustermeans, index, True)
@@ -49,7 +52,7 @@ def closest_search(datapoint, clustermeans):
     # Check which is closer: index or index-1
     ind_diff = abs(clustermeans[index] - datapoint)
     indm1_diff = abs(clustermeans[index-1] - datapoint)
-    
+
     # If ind_diff == indm1_diff then the datapoint is *exactly* halfway between the two
     if ind_diff == indm1_diff:
         return randint(index-1, index)
@@ -71,7 +74,7 @@ def closest_search_no_dups(datapoints, k, means, cluster_sums, cluster_count):
     dividerpos = [0]*(k-1)
 
     dividerpos[0] = cluster_count[0]
-    
+
     for i in range(1, k-1):
         dividerpos[i] = dividerpos[i-1] + cluster_count[i]
 
@@ -79,7 +82,7 @@ def closest_search_no_dups(datapoints, k, means, cluster_sums, cluster_count):
     cluster_inbetweens = [0]*(k-1)
     for i in range(k-1):
         cluster_inbetweens[i] = (means[i]+means[i+1])/2
-    
+
     #print(f"dividerpos: {dividerpos}")
     #print(f"inbetweens: {cluster_inbetweens}")
     n = 0
@@ -95,7 +98,7 @@ def closest_search_no_dups(datapoints, k, means, cluster_sums, cluster_count):
         if datapoints[dividerpos[i]-1] < cluster_inbetweens[i] and datapoints[dividerpos[i]] >= cluster_inbetweens[i]:
             #print("Divider is in the same place. Rejoice! Do nothing.")
             continue
-            
+
         # If it's to the left, then datapoints[dividerpos-1] >= cluster_inbetweens[i]
         # If it's to the right, then 
         if datapoints[dividerpos[i]-1] >= cluster_inbetweens[i]:
@@ -131,22 +134,103 @@ def closest_search_no_dups(datapoints, k, means, cluster_sums, cluster_count):
 
                 j += 1
                 n += 1
-            
+
             # j is the new divider position. We don't need to store it though so it's fine.
             dividerpos[i] = j
 
-    #print("Algorithm done!")
-    #print(f"dividerpos: {dividerpos}")
-    #print(f"cluster_sums: {cluster_sums}")
-    #print(f"cluster_count: {cluster_count}")
-    print(n/k)
-    return (cluster_sums, cluster_count, n/k)
+    return (cluster_sums, cluster_count, n / (k-1))
+
+def cluster_fast_dataset(dataset, cluster_count):
+    # Sort the dataset
+    dataset.sort()
+
+    # Get the minimum and maximum
+    minimum = dataset[0]
+    maximum = dataset[len(dataset)-1]
+
+    new_means = np.zeros(cluster_count)
+
+    # Simple linear interpolation
+    for i in range(cluster_count):
+        new_means[i] = (i/cluster_count)*maximum + (1-i/cluster_count)*minimum
+
+    # Get each datapoint in its respective cluster
+    cluster_counts = [0]*cluster_count
+    cluster_sums = [0]*cluster_count
+    for i in range(len(dataset)):
+        index = closest_search_naive(dataset[i], new_means)
+        cluster_counts[index] += 1
+        cluster_sums[index] += dataset[i]
+
+    # If there is an empty cluster (or multiple) just get rid of it.
+    # Believe it or not, this is the "industry standard" approach.
+    while 0 in cluster_counts:
+        index = cluster_counts.index(0)
+        del cluster_counts[index]
+        del cluster_sums[index]
+        new_means = np.delete(new_means, index)
+        cluster_count -= 1
+
+    # Update means
+    for i in range(cluster_count):
+        new_means[i] = cluster_sums[i] / cluster_counts[i]
+
+    means = np.zeros(cluster_count)
+
+    # Now do iterations
+    x_sum = 0
+    iters = 0
+    iter_absolute = 0
+    while not np.array_equal(means, new_means):
+        iter_absolute += 1
+        print(f"Iteration {iter_absolute}")
+        means = new_means.copy()
+        new_means = np.zeros(cluster_count)
+
+        # If each cluster is unique then use our fast algorithm.
+        if unique_array(means):
+            (cluster_sums, cluster_counts, x) = closest_search_no_dups(
+                dataset, cluster_count, means, cluster_sums, cluster_counts
+            )
+
+            iters += 1
+            x_sum += x + 1
+            pass
+        else:
+            # Use the slow algorithm
+            print("Using slow method")
+            cluster_counts = [0]*cluster_count
+            cluster_sums = [0]*cluster_count
+
+            for i in range(len(dataset)):
+                index = closest_search_naive(dataset[i], new_means)
+                cluster_counts[index] += 1
+                cluster_sums[index] += dataset[i]
+
+        # If there is an empty cluster (or multiple) just get rid of it.
+        # Believe it or not, this is the "industry standard" approach.
+        while 0 in cluster_counts:
+            index = cluster_counts.index(0)
+            del cluster_counts[index]
+            del cluster_sums[index]
+            means = np.delete(means, index)
+            new_means = np.delete(new_means, index)
+            cluster_count -= 1
+
+        # Recalculate means
+        for i in range(cluster_count):
+            new_means[i] = cluster_sums[i] / cluster_counts[i]
+
+    # End of while loop - we've reached a stable configuration
+    # Return new means and average x value
+    return (new_means, iters, x_sum / iters)
+
 
 if __name__ == '__main__':
     # Open our converted data and read it in
     with open(JSON_FILENAME, 'r') as my_file:
         full_data = json.load(my_file)
-    
+
     # 1: Choose k random points, assign the mean of each cluster to the value of its single data point
     # 2: Assign each data point its cluster based on which mean is closest
     # 3: Calculate the new means for each cluster based on the data points inside
@@ -154,11 +238,6 @@ if __name__ == '__main__':
 
     # 1: Choose k random points (sea surface temperature)
     data = full_data[VARIABLES[4]]
-    means = np.zeros(k)
-    new_means = np.zeros(k)
-    
-    cluster_sums = [0]*k
-    cluster_count = [0]*k
 
     # Use O(n log n) time to determine cluster sums and cluster counts
     data_ordered = np.zeros(TOTAL_LAT * TOTAL_LON)
@@ -171,108 +250,22 @@ if __name__ == '__main__':
     
     data_ordered.sort()
     data_ordered = data_ordered[np.searchsorted(data_ordered, -32766):]
-    print(len(data_ordered))
-    
-    # NOTE: Randomly choosing data points has a chance of creating clusters with 0 items in it which will crash the program.
-    for i in range(k):
-        x = None
-        while x is None:
-            x = data_ordered[randint(0, len(data_ordered))]
-        new_means[i] = x
-    
-    # Determine the min/max of the data points
-    #minimum = 99999999
-    #maximum = -9999999
 
-    #for i in range(TOTAL_LAT):
-    #    for j in range(TOTAL_LON):
-    #        if data[i][j] is None:
-    #            continue
+    (means, iters, average_x) = cluster_fast_dataset(data_ordered, 25)
 
-    #        if data[i][j] < minimum:
-    #            minimum = data[i][j]
-    #        elif data[i][j] > maximum:
-    #            maximum = data[i][j]
-    
-    # We now have minimum and maximum. Evenly divide the new means.
-    #for i in range(k):
-    #    new_means[i] = (i/k)*minimum + (1-i/k)*maximum # Simple linear interpolation
-
-    # Sort means by magnitude
-    new_means.sort()
-    print(new_means)
-
-
-    
-    # Get rid of any None values
-
-    # Determine cluster sums and cluster counts
-    dividing_points = [0]*(k-1)
-    for i in range(k-1):
-        dividing_points[i] = (new_means[i] + new_means[i+1])/2
-    
-    current_dividing_point = 0
-
-    for i in range(len(data_ordered)):
-        if current_dividing_point < k-1 and data_ordered[i] >= dividing_points[current_dividing_point]:
-            current_dividing_point += 1
-            print(f"dividing at {i}")
-        cluster_count[current_dividing_point] += 1
-        cluster_sums[current_dividing_point] += data_ordered[i]
-        
-
-    print(cluster_count)
-    print(cluster_sums)
-
-    print("Starting loop")
-    iters = 0
-    while not np.array_equal(means, new_means):
-        iters += 1
-        means = new_means.copy()
-        new_means = np.zeros(k)
-        
-        # 2: Assign each value to whichever mean is closest (random tiebreaker)
-        # Are there any duplicates in the means?
-        if not np.array_equal(means, np.unique(means)):
-            print("Slow method")
-            # There is, so let's use the old slow method instead.
-            cluster_sums = [0]*k
-            cluster_count = [0]*k
-            for i in range(TOTAL_LAT):
-                for j in range(TOTAL_LON):
-                    if data[i][j] == None:
-                        continue
-                    cluster = closest_search(data[i][j], means)
-                    cluster_sums[cluster] += data[i][j]
-                    cluster_count[cluster] += 1
-        else:
-            # There isn't! Gotta go fast!
-            (cluster_sums, cluster_count) = closest_search_no_dups(
-                data_ordered, k, means, cluster_sums, cluster_count
-            )
-
-        #print(cluster_count)
-
-        # 3: Calculate new cluster means
-        for i in range(k):
-            new_means[i] = cluster_sums[i]/cluster_count[i]
-
-        # Due to the way the algorithm works, the new means can never go out of order.
-        # new_means.sort()
-        
-        # 4: If means are different than new means, go back to 2
-    
     # We now have the final clustering - display the means of each cluster!
-    print(new_means)
+    print(means)
     print(iters)
+    print(average_x)
+
     # For each data point, find its cluster and make the value of the data point equal to the mean of the cluster.
-    #for i in range(TOTAL_LAT):
-    #    for j in range(TOTAL_LON):
-    #        if data[i][j] == None:
-    #            continue
-    #        cluster = closest_search(data[i][j], new_means)
-    #        full_data[VARIABLES[4]][i][j] = new_means[cluster]
+    for i in range(TOTAL_LAT):
+        for j in range(TOTAL_LON):
+            if data[i][j] == None:
+                continue
+            cluster = closest_search_naive(data[i][j], means)
+            full_data[VARIABLES[4]][i][j] = means[cluster]
     
     # Now write this to a new data json so it can be mapped.
-    #with open('converted_data2.json', 'w') as outfile:
-    #    json.dump(full_data, outfile)
+    with open('converted_data2.json', 'w') as outfile:
+        json.dump(full_data, outfile)

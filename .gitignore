@@ -1,5 +1,6 @@
 # Dataset
-
+Scripts/output
+*.json
 *.nc
 
 # Annoying LaTeX temp files

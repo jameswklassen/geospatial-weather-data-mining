@@ -1,0 +1,18 @@
+#!/bin/sh
+
+VARIABLES="
+    sea_surface_temperature
+    mean_sea_level_pressure
+    total_cloud_cover
+    two_metre_temperature"
+
+OUTPUT_DIR="output/img"
+BASE_DIR=$(pwd)
+
+for variable in $VARIABLES; do
+    cd "$OUTPUT_DIR/$variable"
+    echo "Creating $variable.gif"
+    ffmpeg -hide_banner -loglevel panic -framerate 5 -i %d.png "00_$variable.gif"
+
+    cd "$BASE_DIR"
+done

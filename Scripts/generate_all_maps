@@ -1,0 +1,8 @@
+#!/bin/sh
+
+DATA_DIR=${1:-"./output/converted/"}
+
+for FILE in $DATA_DIR*.json; do
+    echo "Generating map for $FILE"
+    python generate_map.py -i $FILE
+done

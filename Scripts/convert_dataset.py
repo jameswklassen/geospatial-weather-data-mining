@@ -1,9 +1,11 @@
-from netCDF4 import Dataset
-import argparse
-import numpy as np
+import os
+import errno
 import json
+import argparse
+from netCDF4 import Dataset
+import numpy as np
 import multiprocessing as mp
-from consts import TOTAL_LAT, TOTAL_LON, KELVIN, DEFAULT_INPUT_FILENAME, VARIABLES
+from consts import TOTAL_LAT, TOTAL_LON, DAYS_IN_YEAR, KELVIN, VARIABLES, DATA_DIRECTORY, OUTPUT_DIRECTORY
 
 """
 file: convert_dataset
@@ -13,24 +15,24 @@ purpose:
  - only select the variables we want
 """
 
-DEFAULT_OUTPUT_FILENAME = 'converted_data.json'
+DEFAULT_INPUT_FILENAME = DATA_DIRECTORY + '/EAR5-01-01-2020.nc'
+DEFAULT_CONVERSION_DIRECTORY = OUTPUT_DIRECTORY + '/converted'
 
-INPUT_FILENAME = DEFAULT_INPUT_FILENAME
-OUTPUT_FILENAME = DEFAULT_OUTPUT_FILENAME
+COMPRESS = True
 
 LAT_LON_PRECISION = 4       # how many pieces lat/lon is divided into (i.e. each integer lat/lon has 4 data points)
 MASK_THRESHOLD = 5          # might need to tweak this, the values seem to be within 0-256, but not fully understood yet
 
 
-def mean(var, lat, lon):
+def mean(var, day, lat, lon):
     """
-    Given a lat/long, calculate the mean of all data points within the lat/long,
+    Given date & lat/long, calculate the mean of all data points within the lat/long for that date,
     since our dataset stores lat long in increments of 0.25
 
     ie) mean(lat,lon + (lat+0.25),lon + (lat+0.5),lon + (lat+0.75...)....etc
     """
 
-    values = var[0, (LAT_LON_PRECISION*lat):(LAT_LON_PRECISION*(lat+LAT_LON_PRECISION)), (LAT_LON_PRECISION*lon):(LAT_LON_PRECISION*(lon+LAT_LON_PRECISION))]
+    values = var[day, (LAT_LON_PRECISION*lat):(LAT_LON_PRECISION*(lat+LAT_LON_PRECISION)), (LAT_LON_PRECISION*lon):(LAT_LON_PRECISION*(lon+LAT_LON_PRECISION))]
 
     # if there are too many masked values return null
     if np.ma.count_masked(values) > MASK_THRESHOLD:
@@ -39,19 +41,17 @@ def mean(var, lat, lon):
     return np.mean(values)
 
 
-def process_data(lat_start, lat_end):
+def process_data(input_filename, day, lat_start, lat_end):
     """
     Process data over the lat range (lat_start, lat_end)
     """
 
-    print(f"start: {lat_start} end: {lat_end}")
+    print(f"{lat_start:<3} to {lat_end:<3}")
 
     data = {var: [['-']*TOTAL_LON for _ in range(TOTAL_LAT)] for var in VARIABLES}
 
-    ctd = Dataset(INPUT_FILENAME, 'r')
+    ctd = Dataset(input_filename, 'r')
 
-    ten_metre_U_wind_component = ctd.variables['u10']
-    ten_metre_V_wind_component = ctd.variables['v10']
     two_metre_temperature = ctd.variables['t2m']
     mean_sea_level_pressure = ctd.variables['msl']
     sea_surface_temperature = ctd.variables['sst']
@@ -59,7 +59,7 @@ def process_data(lat_start, lat_end):
 
     for lat in range(lat_start, lat_end):
         for lon in range(TOTAL_LON):
-            mean_sea_surface_temperature = mean(sea_surface_temperature, lat, lon)
+            mean_sea_surface_temperature = mean(sea_surface_temperature, day, lat, lon)
 
             # if sea surface temp is None:
             # don't care about any other data -> set all to None
@@ -67,39 +67,23 @@ def process_data(lat_start, lat_end):
                 for variable in VARIABLES:
                     data[variable][lat][lon] = None
             else:
-                data['ten_metre_U_wind_component'][lat][lon] = mean(ten_metre_U_wind_component, lat, lon)
-                data['ten_metre_V_wind_component'][lat][lon] = mean(ten_metre_V_wind_component, lat, lon)
-                data['two_metre_temperature'][lat][lon] = mean(two_metre_temperature, lat, lon) - KELVIN
-                data['mean_sea_level_pressure'][lat][lon] = mean(mean_sea_level_pressure, lat, lon) / 1000
+                data['two_metre_temperature'][lat][lon] = mean(two_metre_temperature, day, lat, lon) - KELVIN
+                data['mean_sea_level_pressure'][lat][lon] = mean(mean_sea_level_pressure, day, lat, lon) / 1000
                 data['sea_surface_temperature'][lat][lon] = mean_sea_surface_temperature - KELVIN
-                data['total_cloud_cover'][lat][lon] = mean(total_cloud_cover, lat, lon)
+                data['total_cloud_cover'][lat][lon] = mean(total_cloud_cover, day, lat, lon)
 
     return data
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
+def convert_data_for_day(day):
+    print("Converting data for", day)
 
-    parser.add_argument("-i", "--input", help="Input file", default=DEFAULT_INPUT_FILENAME)
-    parser.add_argument("-o", "--output", help="Output file", default=DEFAULT_OUTPUT_FILENAME)
-
-    args = parser.parse_args()
-
-    if args.input:
-        INPUT_FILENAME = args.input
-        print("input file", INPUT_FILENAME)
-
-    if args.output:
-        OUTPUT_FILENAME = args.output
-        print("output file:", OUTPUT_FILENAME)
-
-    # data dictionary to store each data point as an array of values
     data = {var: [['-']*TOTAL_LON for _ in range(TOTAL_LAT)] for var in VARIABLES}
 
     pool = mp.Pool(mp.cpu_count())
 
     # Pool.starmap is multithreading magic
-    results = pool.starmap(process_data, [(i, i+10) for i in range(0, TOTAL_LAT, 10)])
+    results = pool.starmap(process_data, [(INPUT_FILENAME, day, i, i+10) for i in range(0, TOTAL_LAT, 10)])
 
     # Merge all the partial results and we're done
     for result in results:
@@ -109,6 +93,48 @@ if __name__ == '__main__':
                     if result[var][lat][lon] != '-':
                         data[var][lat][lon] = result[var][lat][lon]
 
-    # Save the converted data as a json file after processing
-    with open(OUTPUT_FILENAME, 'w') as outfile:
+    try:
+        os.makedirs(DEFAULT_CONVERSION_DIRECTORY)
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise
+
+    with open(f"{DEFAULT_CONVERSION_DIRECTORY}/{day}.json", 'w') as outfile:
         json.dump(data, outfile)
+
+
+def init():
+    try:
+        os.makedirs(OUTPUT_DIRECTORY)
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise
+
+    try:
+        os.makedirs(DEFAULT_CONVERSION_DIRECTORY)
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("-i", "--input", help="Input file", default=DEFAULT_INPUT_FILENAME)
+    parser.add_argument("-c", "--compress", type=bool, help="Compress", default=True)
+
+    args = parser.parse_args()
+
+    INPUT_FILENAME = args.input
+    OUTPUT_FILENAME = args.output
+
+    print("input file", INPUT_FILENAME)
+    print("output file:", OUTPUT_FILENAME)
+    print("compress", args.compress)
+
+    init()
+
+    ctd = Dataset(INPUT_FILENAME, 'r')
+
+    for day in range(DAYS_IN_YEAR):
+        convert_data_for_day(day)

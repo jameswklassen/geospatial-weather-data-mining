@@ -1,3 +1,7 @@
+# Dataset
+
+*.nc
+
 # Annoying LaTeX temp files
 *.log
 *.toc

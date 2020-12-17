@@ -1,9 +1,9 @@
 from netCDF4 import Dataset
+import argparse
 import numpy as np
 import json
 import multiprocessing as mp
-from consts import TOTAL_LAT, TOTAL_LON, KELVIN, INPUT_FILENAME, VARIABLES
-
+from consts import TOTAL_LAT, TOTAL_LON, KELVIN, DEFAULT_INPUT_FILENAME, VARIABLES
 
 """
 file: convert_dataset
@@ -12,6 +12,11 @@ purpose:
  - convert data from the raw large NetCDF file to a reduced size JSON file
  - only select the variables we want
 """
+
+DEFAULT_OUTPUT_FILENAME = 'converted_data.json'
+
+INPUT_FILENAME = DEFAULT_INPUT_FILENAME
+OUTPUT_FILENAME = DEFAULT_OUTPUT_FILENAME
 
 LAT_LON_PRECISION = 4       # how many pieces lat/lon is divided into (i.e. each integer lat/lon has 4 data points)
 MASK_THRESHOLD = 5          # might need to tweak this, the values seem to be within 0-256, but not fully understood yet
@@ -73,6 +78,21 @@ def process_data(lat_start, lat_end):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("-i", "--input", help="Input file", default=DEFAULT_INPUT_FILENAME)
+    parser.add_argument("-o", "--output", help="Output file", default=DEFAULT_OUTPUT_FILENAME)
+
+    args = parser.parse_args()
+
+    if args.input:
+        INPUT_FILENAME = args.input
+        print("input file", INPUT_FILENAME)
+
+    if args.output:
+        OUTPUT_FILENAME = args.output
+        print("output file:", OUTPUT_FILENAME)
+
     # data dictionary to store each data point as an array of values
     data = {var: [['-']*TOTAL_LON for _ in range(TOTAL_LAT)] for var in VARIABLES}
 
@@ -90,5 +110,5 @@ if __name__ == '__main__':
                         data[var][lat][lon] = result[var][lat][lon]
 
     # Save the converted data as a json file after processing
-    with open('converted_data.json', 'w') as outfile:
+    with open(OUTPUT_FILENAME, 'w') as outfile:
         json.dump(data, outfile)

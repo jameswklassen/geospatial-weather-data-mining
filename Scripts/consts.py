@@ -1,7 +1,7 @@
 TOTAL_LON = 360             # number of longitude int values on earth
 TOTAL_LAT = 180             # number of latitude int values on earth
 KELVIN = 273.15             # used to convert between Kelvin and Celsius
-INPUT_FILENAME = 'EAR5-01-01-2020.nc'       # filename containing raw .nc data
+DEFAULT_INPUT_FILENAME = 'EAR5-01-01-2020.nc'       # filename containing raw .nc data
 
 VARIABLES = [
     'ten_metre_U_wind_component',

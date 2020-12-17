@@ -126,10 +126,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     INPUT_FILENAME = args.input
-    OUTPUT_FILENAME = args.output
 
     print("input file", INPUT_FILENAME)
-    print("output file:", OUTPUT_FILENAME)
     print("compress", args.compress)
 
     init()

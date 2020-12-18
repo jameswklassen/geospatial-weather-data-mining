@@ -1,21 +1,22 @@
 import os
+from os import listdir
+from os.path import isfile, join
 import errno
-from datetime import datetime
+import json
 import argparse
-from datetime import date
+import numpy as np
+import multiprocessing as mp
+from datetime import datetime
 import matplotlib.pyplot as plt
 from matplotlib import colors, cm
 import cartopy.crs as ccrs
-import json
-import numpy as np
-
-from netCDF4 import Dataset
-
 from consts import TOTAL_LAT, TOTAL_LON, OUTPUT_DIRECTORY
 
 JSON_FILENAME = 'converted_data.json'
 IMG_DIRECTORY = OUTPUT_DIRECTORY + '/img'
 OUTPUT_FORMATS = ['png']
+
+INPUT_DIRECTORY = OUTPUT_DIRECTORY + '/converted'
 
 MARKER_SIZE = 3
 MARKER = ","
@@ -52,7 +53,9 @@ def color_map(var):
         return cm.jet
 
 
-def plot_thing(data, variable, day, cmap):
+def plot(data, variable, day, cmap):
+    """Plot a single variable on a single day"""
+
     title = variable
 
     plt.suptitle(title, fontsize=16)
@@ -91,6 +94,26 @@ def day_str(day):
     return dt.strftime("%B %d")
 
 
+def generate_plots(filename):
+    """Generate plots for all variables given a .json file"""
+
+    print('Generating plot for', filename)
+
+    with open(filename, 'r') as my_file:
+        json_data = my_file.read()
+        data = json.loads(json_data)
+
+    day = os.path.basename(filename).split('.')[0]
+
+    for variable in data.keys():
+        plot(
+            np.array(data[variable], dtype=np.float64),
+            variable,
+            day,
+            color_map(variable)
+        )
+
+
 def init():
     try:
         os.makedirs(OUTPUT_DIRECTORY)
@@ -107,26 +130,18 @@ def init():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-
-    parser.add_argument("-i", "--input", help="Input JSON file", default=JSON_FILENAME)
-
+    parser.add_argument("-i", "--input", help="Input JSON file")
     args = parser.parse_args()
-
-    INPUT_FILENAME = args.input
 
     init()
 
-    # Open our converted data and read it in
-    with open(INPUT_FILENAME, 'r') as my_file:
-        json_data = my_file.read()
-        data = json.loads(json_data)
+    if args.input:
+        generate_plots(args.input)
+    else:
+        print("Generating plots for all .json files in", INPUT_DIRECTORY)
+        files = [f"{INPUT_DIRECTORY}/{f}" for f in listdir(INPUT_DIRECTORY) if isfile(join(INPUT_DIRECTORY, f))]
 
-    day = os.path.basename(INPUT_FILENAME).split('.')[0]
+        pool = mp.Pool(mp.cpu_count())
+        pool.map(generate_plots, files)
 
-    for variable in data.keys():
-        plot_thing(
-            np.array(data[variable], dtype=np.float64),
-            variable,
-            day,
-            color_map(variable)
-        )
+    print('End of processing.')

@@ -11,6 +11,8 @@ from matplotlib import colors, cm
 import cartopy.crs as ccrs
 from consts import TOTAL_LAT, TOTAL_LON, OUTPUT_DIRECTORY
 
+DEBUG = False
+
 INPUT_DIRECTORY = OUTPUT_DIRECTORY + '/converted'
 IMG_DIRECTORY = OUTPUT_DIRECTORY + '/img'
 
@@ -34,7 +36,10 @@ def save_file(dir, name):
 
     for output_format in OUTPUT_FORMATS:
         path = f"{dir_path}/{name}.{output_format}"
-        print(f"Writing {path}")
+
+        if DEBUG:
+            print(f"Writing {path}")
+
         plt.savefig(path, format=output_format, bbox_inches='tight', dpi=500)
 
 
@@ -137,14 +142,14 @@ if __name__ == '__main__':
 
     elif args.input and isdir(args.input):
         print("Generating plots for all .json files in", args.input)
-        files = [f"{args.input}/{f}" for f in listdir(args.input) if isfile(join(args.input, f))]
+        files = [f"{args.input}/{f}" for f in listdir(args.input) if isfile(join(args.input, f)) if f.endswith('json')]
 
         pool = mp.Pool(mp.cpu_count())
         pool.starmap(generate_plots, [(file, args.output) for file in files])
 
     else:
         print("Generating plots for all .json files in", INPUT_DIRECTORY)
-        files = [f"{INPUT_DIRECTORY}/{f}" for f in listdir(INPUT_DIRECTORY) if isfile(join(INPUT_DIRECTORY, f))]
+        files = [f"{INPUT_DIRECTORY}/{f}" for f in listdir(INPUT_DIRECTORY) if isfile(join(INPUT_DIRECTORY, f)) if f.endswith('json')]
 
         pool = mp.Pool(mp.cpu_count())
         pool.starmap(generate_plots, [(file, args.output) for file in files])

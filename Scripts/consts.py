@@ -9,6 +9,7 @@ DATA_DIRECTORY = os.getcwd() + '/../Data'
 OUTPUT_DIRECTORY = 'output'
 CONVERTED_DIRECTORY = OUTPUT_DIRECTORY + '/converted'
 CLUSTERED_DIRECTORY = OUTPUT_DIRECTORY + '/clustered'
+FCLUSTERED_DIRECTORY = OUTPUT_DIRECTORY + '/fclustered'
 
 VARIABLES = [
     'two_metre_temperature',

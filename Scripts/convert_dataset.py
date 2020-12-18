@@ -5,7 +5,7 @@ import argparse
 from netCDF4 import Dataset
 import numpy as np
 import multiprocessing as mp
-from consts import TOTAL_LAT, TOTAL_LON, DAYS_IN_YEAR, KELVIN, VARIABLES, DATA_DIRECTORY, OUTPUT_DIRECTORY
+from consts import TOTAL_LAT, TOTAL_LON, DAYS_IN_YEAR, KELVIN, VARIABLES, DATA_DIRECTORY, OUTPUT_DIRECTORY, CONVERTED_DIRECTORY
 
 """
 file: convert_dataset
@@ -16,7 +16,6 @@ purpose:
 """
 
 DEFAULT_INPUT_FILENAME = DATA_DIRECTORY + '/EAR5-01-01-2020.nc'
-DEFAULT_CONVERSION_DIRECTORY = OUTPUT_DIRECTORY + '/converted'
 
 COMPRESS = True
 
@@ -94,12 +93,12 @@ def convert_data_for_day(day):
                         data[var][lat][lon] = result[var][lat][lon]
 
     try:
-        os.makedirs(DEFAULT_CONVERSION_DIRECTORY)
+        os.makedirs(CONVERTED_DIRECTORY)
     except OSError as e:
         if e.errno != errno.EEXIST:
             raise
 
-    with open(f"{DEFAULT_CONVERSION_DIRECTORY}/{day}.json", 'w') as outfile:
+    with open(f"{CONVERTED_DIRECTORY}/{day}.json", 'w') as outfile:
         json.dump(data, outfile)
 
 
@@ -111,7 +110,7 @@ def init():
             raise
 
     try:
-        os.makedirs(DEFAULT_CONVERSION_DIRECTORY)
+        os.makedirs(CONVERTED_DIRECTORY)
     except OSError as e:
         if e.errno != errno.EEXIST:
             raise

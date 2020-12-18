@@ -7,10 +7,10 @@ VARIABLES="
     total_cloud_cover
     two_metre_temperature"
 
-OUTPUT_DIR="output/img"     # directory containing the images
-EXT_OUT="mp4"               # extension of the file ffmpeg should output
-FRAMERATE=30                # desired output framerate
-OVERWRITE=false             # should ffmpeg blindly overwrite files?
+OUTPUT_DIR="${1:-output/img}"   # directory containing the images
+EXT_OUT="mp4"                   # extension of the file ffmpeg should output
+FRAMERATE=30                    # desired output framerate
+OVERWRITE=false                 # should ffmpeg blindly overwrite files?
 
 for variable in $VARIABLES; do
     cd "$OUTPUT_DIR/$variable"

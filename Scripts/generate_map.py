@@ -1,6 +1,5 @@
-import os
-from os import listdir
-from os.path import isfile, join
+from os import listdir, makedirs
+from os.path import isfile, isdir, join, basename
 import errno
 import json
 import argparse
@@ -28,7 +27,7 @@ def save_file(dir, name):
 
     dir_path = f"{IMG_DIRECTORY}/{dir}"
     try:
-        os.makedirs(dir_path)
+        makedirs(dir_path)
     except OSError as e:
         if e.errno != errno.EEXIST:
             raise
@@ -48,7 +47,7 @@ def color_map(var):
         return cm.jet
 
 
-def plot(data, variable, day, cmap):
+def plot(data, variable, day, cmap, output_dir=None):
     """Plot a single variable on a single day"""
 
     title = variable
@@ -75,7 +74,8 @@ def plot(data, variable, day, cmap):
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     plt.colorbar(sm, shrink=0.5)
 
-    save_file(variable, day)
+    file_dir = f"{output_dir}/{variable}" if output_dir else variable
+    save_file(file_dir, day)
 
 
 def day_str(day):
@@ -89,7 +89,7 @@ def day_str(day):
     return dt.strftime("%B %d")
 
 
-def generate_plots(filename):
+def generate_plots(filename, output_dir=None):
     """Generate plots for all variables given a .json file"""
 
     print('Generating plot for', filename)
@@ -98,26 +98,27 @@ def generate_plots(filename):
         json_data = my_file.read()
         data = json.loads(json_data)
 
-    day = os.path.basename(filename).split('.')[0]
+    day = basename(filename).split('.')[0]
 
     for variable in data.keys():
         plot(
             np.array(data[variable], dtype=np.float64),
             variable,
             day,
-            color_map(variable)
+            color_map(variable),
+            output_dir=output_dir
         )
 
 
 def init():
     try:
-        os.makedirs(OUTPUT_DIRECTORY)
+        makedirs(OUTPUT_DIRECTORY)
     except OSError as e:
         if e.errno != errno.EEXIST:
             raise
 
     try:
-        os.makedirs(IMG_DIRECTORY)
+        makedirs(IMG_DIRECTORY)
     except OSError as e:
         if e.errno != errno.EEXIST:
             raise
@@ -126,17 +127,26 @@ def init():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input", help="Input JSON file")
+    parser.add_argument("-o", "--output", help="Output subdirectory", default=None)
     args = parser.parse_args()
 
     init()
 
-    if args.input:
-        generate_plots(args.input)
+    if args.input and isfile(args.input):
+        generate_plots(args.input, args.output)
+
+    elif args.input and isdir(args.input):
+        print("Generating plots for all .json files in", args.input)
+        files = [f"{args.input}/{f}" for f in listdir(args.input) if isfile(join(args.input, f))]
+
+        pool = mp.Pool(mp.cpu_count())
+        pool.starmap(generate_plots, [(file, args.output) for file in files])
+
     else:
         print("Generating plots for all .json files in", INPUT_DIRECTORY)
         files = [f"{INPUT_DIRECTORY}/{f}" for f in listdir(INPUT_DIRECTORY) if isfile(join(INPUT_DIRECTORY, f))]
 
         pool = mp.Pool(mp.cpu_count())
-        pool.map(generate_plots, files)
+        pool.starmap(generate_plots, [(file, args.output) for file in files])
 
     print('End of processing.')

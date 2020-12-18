@@ -119,10 +119,8 @@ def init():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-
     parser.add_argument("-i", "--input", help="Input file", default=DEFAULT_INPUT_FILENAME)
     parser.add_argument("-c", "--compress", type=bool, help="Compress", default=True)
-
     args = parser.parse_args()
 
     INPUT_FILENAME = args.input

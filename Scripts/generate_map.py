@@ -12,15 +12,10 @@ from matplotlib import colors, cm
 import cartopy.crs as ccrs
 from consts import TOTAL_LAT, TOTAL_LON, OUTPUT_DIRECTORY
 
-JSON_FILENAME = 'converted_data.json'
-IMG_DIRECTORY = OUTPUT_DIRECTORY + '/img'
-OUTPUT_FORMATS = ['png']
-
 INPUT_DIRECTORY = OUTPUT_DIRECTORY + '/converted'
+IMG_DIRECTORY = OUTPUT_DIRECTORY + '/img'
 
-MARKER_SIZE = 3
-MARKER = ","
-
+OUTPUT_FORMATS = ['png']
 COLOR_LEVELS = 60
 CORNER_SMOOTHING = True
 

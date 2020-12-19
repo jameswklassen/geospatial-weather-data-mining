@@ -1,0 +1,21 @@
+#!/bin/sh
+
+K_VALUES="5 7 10 15"
+
+CONVERTED_DATA_DIR="output/converted"
+
+for k in $K_VALUES; do
+    echo "k=$k"
+    echo "-----"
+
+    # Run the clustering algorithm on converted data
+    python fcluster.py -i "$CONVERTED_DATA_DIR" -k $k -o "k=$k"
+
+    # Generate figures based on the clustered data
+    python generate_map.py -i "output/fclustered/k=$k" -o "k=$k"
+
+    # Generate mp4 files from the figures
+    ./convert_image_sequences "output/img/k=$k"
+
+    echo
+done

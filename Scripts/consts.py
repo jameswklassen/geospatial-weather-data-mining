@@ -16,5 +16,27 @@ VARIABLES = [
     'two_metre_temperature',
     'mean_sea_level_pressure',
     'sea_surface_temperature',
-    'total_cloud_cover'
+    # 'total_cloud_cover'
 ]
+
+IGNORED_VARIABLES = [
+    'total_cloud_cover',
+]
+
+DEG = u'\N{DEGREE SIGN}'
+
+
+def get_units(var):
+    if var == 'mean_sea_level_pressure':
+        return 'kPa'
+    else:
+        return DEG + ' C'
+
+
+def get_english_variable_name(var):
+    if var == 'two_metre_temperature':
+        return 'Two metre temperature'
+    if var == 'mean_sea_level_pressure':
+        return 'Mean sea level pressure'
+    if var == 'sea_surface_temperature':
+        return 'Sea surface temperature'

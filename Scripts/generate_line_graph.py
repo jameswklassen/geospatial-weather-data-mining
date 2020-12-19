@@ -6,13 +6,12 @@ import argparse
 import numpy as np
 import multiprocessing as mp
 from datetime import datetime
-import matplotlib as mpl
 import matplotlib.pyplot as plt
-from matplotlib import colors, cm
-import cartopy.crs as ccrs
-from consts import TOTAL_LAT, TOTAL_LON, OUTPUT_DIRECTORY, IGNORED_VARIABLES, DEFAULT_K, get_english_variable_name
+from consts import TOTAL_LAT, TOTAL_LON, OUTPUT_DIRECTORY, IGNORED_VARIABLES, DEG, DEFAULT_K, get_units, get_english_variable_name
 
 DEBUG = False
+
+LON = 185
 
 INPUT_DIRECTORY = OUTPUT_DIRECTORY + '/converted'
 IMG_DIRECTORY = OUTPUT_DIRECTORY + '/img'
@@ -44,55 +43,28 @@ def save_file(dir, name):
         plt.savefig(path, format=output_format, bbox_inches='tight', dpi=500)
 
 
-def color_map(var):
-    if var == 'mean_sea_level_pressure':
-        return cm.BuPu
-    elif var == 'total_cloud_cover':
-        return cm.get_cmap('Blues_r')
-    else:
-        return cm.jet
-
-
-def plot(data, variable, day, cmap, output_dir=None, ranges=None, k=None):
+def plot(data, variable, day, output_dir=None, ranges=None, k=None):
     """Plot a single variable on a single day"""
 
     title = get_english_variable_name(variable)
-    min, max = ranges
 
-    ax = plt.axes(projection=ccrs.PlateCarree(), label=f"{title}-{day}")
-    ax.set_title(title, fontsize=16)
-    c = plt.contourf(
-        lons,
-        lats,
-        data,
-        COLOR_LEVELS,
-        transform=ccrs.PlateCarree(),
-        vmin=min,
-        vmax=max,
-        cmap=cmap,
-        corner_mask=CORNER_SMOOTHING,
-    )
+    plt.suptitle(title, fontsize=16)
+    ax = plt.axes(label=f"{title}-{day}")
+    ax.plot(lats, data[:, LON], color='black')
 
-    # Generate a discrete legend with specific values
-    # proxy = [plt.Rectangle((0, 0), 1, 1, fc=pc.get_facecolor()[0]) for pc in c.collections]
-    # ax.legend(proxy, c.levels)
+    ax.set_xlabel('Latitude')
+
+    ax.set_ylim(ranges)
+    ax.set_ylabel(f"{get_english_variable_name(variable)} ({get_units(variable)})")
+
+    plt.xticks([90, 45, 0, -45, -90], [f'90{DEG} N', f'45{DEG} N', f'0{DEG}', f'45{DEG} S', f'90{DEG} S'])
 
     if k:
         textstr = f"k={k}"
-        ax.text(1, -0.05, textstr, transform=ax.transAxes, fontsize=9, horizontalalignment='right', verticalalignment='top')
+        ax.text(1, 1.05, textstr, transform=ax.transAxes, fontsize=9, horizontalalignment='right', verticalalignment='top')
 
     textstr = day_str(day)
-    ax.text(0, -0.05, textstr, transform=ax.transAxes, fontsize=9, verticalalignment='top')
-
-    ax.coastlines()
-
-    if ranges:
-        norm = colors.Normalize(vmin=min, vmax=max)
-    else:
-        norm = colors.Normalize(vmin=np.nanmin(data), vmax=np.nanmax(data))
-
-    sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
-    plt.colorbar(sm, shrink=0.5, orientation='horizontal', pad=0.04)
+    ax.text(0, 1.05, textstr, transform=ax.transAxes, fontsize=9, verticalalignment='top')
 
     file_dir = f"{output_dir}/{variable}" if output_dir else variable
     save_file(file_dir, day)
@@ -129,11 +101,25 @@ def generate_plots(filename, output_dir=None, ranges=None, k=None):
             np.array(data[variable], dtype=np.float64),
             variable,
             day,
-            color_map(variable),
             output_dir=output_dir,
             ranges=ranges[variable],
-            k=k,
+            k=k
         )
+
+
+def find_lon_with_least_land(data):
+    """
+    Given a 2d array of data
+    return the index of the longitude with the least amount of land
+    """
+    nonzeros = np.empty(360)
+    for lon in range(360):
+        arr = np.array(data)
+        nonzeros[lon] = np.count_nonzero(arr[:, lon])
+
+    max_idx = np.where(nonzeros == np.amax(nonzeros))
+
+    return max_idx[0]
 
 
 def init():

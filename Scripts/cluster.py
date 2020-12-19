@@ -175,4 +175,5 @@ if __name__ == '__main__':
         pool = mp.Pool(mp.cpu_count())
         pool.map(cluster_file, files)
 
-    print('End of processing')
+    if DEBUG:
+        print('End of processing')

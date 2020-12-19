@@ -18,7 +18,7 @@ IMG_DIRECTORY = OUTPUT_DIRECTORY + '/img'
 
 OUTPUT_FORMATS = ['png']
 COLOR_LEVELS = 60
-CORNER_SMOOTHING = True
+CORNER_SMOOTHING = False
 
 lons = [i+1.375 for i in range(TOTAL_LON)]
 lats = [i-1.375 for i in range(int(TOTAL_LAT/2), int(-TOTAL_LAT/2), -1)]
@@ -52,19 +52,22 @@ def color_map(var):
         return cm.jet
 
 
-def plot(data, variable, day, cmap, output_dir=None):
+def plot(data, variable, day, cmap, output_dir=None, range=None):
     """Plot a single variable on a single day"""
 
     title = variable
+    min, max = range
 
     plt.suptitle(title, fontsize=16)
-    ax = plt.axes(projection=ccrs.PlateCarree(), label=title)
+    ax = plt.axes(projection=ccrs.PlateCarree(), label=f"{title}-{day}")
     plt.contourf(
         lons,
         lats,
         data,
         COLOR_LEVELS,
         transform=ccrs.PlateCarree(),
+        vmin=min,
+        vmax=max,
         cmap=cmap,
         corner_mask=CORNER_SMOOTHING,
     )
@@ -74,7 +77,10 @@ def plot(data, variable, day, cmap, output_dir=None):
 
     ax.coastlines()
 
-    norm = colors.Normalize(vmin=np.nanmin(data), vmax=np.nanmax(data))
+    if range:
+        norm = colors.Normalize(vmin=min, vmax=max)
+    else:
+        norm = colors.Normalize(vmin=np.nanmin(data), vmax=np.nanmax(data))
 
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     plt.colorbar(sm, shrink=0.5)
@@ -94,10 +100,11 @@ def day_str(day):
     return dt.strftime("%B %d")
 
 
-def generate_plots(filename, output_dir=None):
+def generate_plots(filename, output_dir=None, range=None):
     """Generate plots for all variables given a .json file"""
 
-    print('Generating plot for', filename)
+    if DEBUG:
+        print('Generating plot for', filename)
 
     with open(filename, 'r') as my_file:
         json_data = my_file.read()
@@ -106,12 +113,14 @@ def generate_plots(filename, output_dir=None):
     day = basename(filename).split('.')[0]
 
     for variable in data.keys():
+        min, max = range[variable]
         plot(
             np.array(data[variable], dtype=np.float64),
             variable,
             day,
             color_map(variable),
-            output_dir=output_dir
+            output_dir=output_dir,
+            range=range[variable]
         )
 
 
@@ -137,21 +146,24 @@ if __name__ == '__main__':
 
     init()
 
+    # If input is a single file, easy case
     if args.input and isfile(args.input):
         generate_plots(args.input, args.output)
+        exit()
 
-    elif args.input and isdir(args.input):
-        print("Generating plots for all .json files in", args.input)
-        files = [f"{args.input}/{f}" for f in listdir(args.input) if isfile(join(args.input, f)) if f.endswith('json')]
+    # Since input isn't a single file, it's either
+    #   a) a directory, or
+    #   b) not specified
+    input_dir = args.input if args.input and isdir(args.input) else INPUT_DIRECTORY
 
-        pool = mp.Pool(mp.cpu_count())
-        pool.starmap(generate_plots, [(file, args.output) for file in files])
+    print("Generating plots for all .json files in", input_dir)
 
-    else:
-        print("Generating plots for all .json files in", INPUT_DIRECTORY)
-        files = [f"{INPUT_DIRECTORY}/{f}" for f in listdir(INPUT_DIRECTORY) if isfile(join(INPUT_DIRECTORY, f)) if f.endswith('json')]
+    # Collect all the .json files in input_dir
+    files = [f"{input_dir}/{f}" for f in listdir(input_dir) if isfile(join(input_dir, f)) if f.endswith('json') if not f.startswith('range')]
 
-        pool = mp.Pool(mp.cpu_count())
-        pool.starmap(generate_plots, [(file, args.output) for file in files])
+    with open(f"{input_dir}/range.json", 'r') as my_file:
+        json_data = my_file.read()
+        range = json.loads(json_data)
 
-    print('End of processing.')
+    pool = mp.Pool(mp.cpu_count())
+    pool.starmap(generate_plots, [(file, args.output, range) for file in files])

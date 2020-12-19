@@ -1,26 +1,17 @@
-from os import listdir, makedirs
-from os.path import isfile, isdir, join, basename
-import argparse
-import errno
-import json
-from random import randint
-import multiprocessing as mp
 import numpy as np
-from consts import TOTAL_LAT, TOTAL_LON, VARIABLES, CONVERTED_DIRECTORY, FCLUSTERED_DIRECTORY
+import json
+import multiprocessing as mp
+import argparse
+from random import randint
+from consts import TOTAL_LAT, TOTAL_LON, VARIABLES
 
-DEBUG = False
 JSON_FILENAME = 'converted_data.json'
-
-DEFAULT_K = 25
-
-
+VAR_INDEX = 0
 def unique_array(arr):
     return len(arr) == len(set(arr))
 
-
+# This function breaks ties in the case of there being clusters with identical means.
 def choose_random_duplicate(clustermeans, index, backwards):
-    """Break ties for clusters with identical means"""
-
     if not backwards:
         duplicate_count = 0
         for i in range(index+1, len(clustermeans)):
@@ -70,23 +61,16 @@ def closest_search_naive(datapoint, clustermeans):
     else:
         return choose_random_duplicate(clustermeans, index, True)
 
-
 def closest_search_no_dups(datapoints, k, means, cluster_sums, cluster_count):
-    """
-    closest_search_no_dups
-
-    parameters:
-     - datapoints : all datapoints (sorted as a numpy array),
-     - means, sums and counts for all clusters
-
-    returns:
-     - updated cluster_means, cluster_sums and cluster_counts
-    """
+    # This method takes in ALL datapoints (sorted as a numpy array),
+    # the means, sums and counts for all clusters,
+    # and updates clustermeans, clustersums and clustercounts.
 
     # Find all cluster positions - O(k)
     cluster_sums = cluster_sums.copy()
     cluster_count = cluster_count.copy()
 
+    #print("hello :) in algorithm")
     dividerpos = [0]*(k-1)
 
     dividerpos[0] = cluster_count[0]
@@ -99,6 +83,8 @@ def closest_search_no_dups(datapoints, k, means, cluster_sums, cluster_count):
     for i in range(k-1):
         cluster_inbetweens[i] = (means[i]+means[i+1])/2
 
+    #print(f"dividerpos: {dividerpos}")
+    #print(f"inbetweens: {cluster_inbetweens}")
     n = 0
 
     # There is now a one-to-one correlation between dividerpos[i] and cluster_inbetweens[i].
@@ -108,15 +94,15 @@ def closest_search_no_dups(datapoints, k, means, cluster_sums, cluster_count):
         # Take the old divider location between cluster[i] and cluster[i+1].
         # Is it in the same place, further to the left or to the right?
         # If it's in the same place, then datapoints[dividerpos-1] < cluster_inbetweens[i] and datapoints[dividerpos] > cluster_inbetweens[i].
-        # print(f"data[divide[i]-1]: {datapoints[dividerpos[i]-1]}, cluster_inbetween[i]: {cluster_inbetweens[i]}, data[divide[i]]: {datapoints[dividerpos[i]]}")
+        #print(f"data[divide[i]-1]: {datapoints[dividerpos[i]-1]}, cluster_inbetween[i]: {cluster_inbetweens[i]}, data[divide[i]]: {datapoints[dividerpos[i]]}")
         if datapoints[dividerpos[i]-1] < cluster_inbetweens[i] and datapoints[dividerpos[i]] >= cluster_inbetweens[i]:
-            # print("Divider is in the same place. Rejoice! Do nothing.")
+            #print("Divider is in the same place. Rejoice! Do nothing.")
             continue
 
         # If it's to the left, then datapoints[dividerpos-1] >= cluster_inbetweens[i]
         # If it's to the right, then 
         if datapoints[dividerpos[i]-1] >= cluster_inbetweens[i]:
-            # print("It's to the left!")
+            #print("It's to the left!")
 
             # Iterate until we have that datapoints[dividerpos-1] < cluster_inbetweens[i]
             # Each time, we "move it to the left" by 1, we need to adjust the cluster sum and cluster count for the two clusters
@@ -133,7 +119,7 @@ def closest_search_no_dups(datapoints, k, means, cluster_sums, cluster_count):
                 j -= 1
                 n += 1
         else:
-            # print("It's to the right!")
+            #print("It's to the right!")
             # Iterate until we have that datapoints[dividerpos] >= cluster_inbetweens[i]
             # Each time, we "move it to the right" by 1, we need to adjust the cluster sum and cluster count
             # for the two clusters that the divider divides.
@@ -154,18 +140,7 @@ def closest_search_no_dups(datapoints, k, means, cluster_sums, cluster_count):
 
     return (cluster_sums, cluster_count, n / (k-1))
 
-
 def cluster_fast_dataset(dataset, cluster_count):
-    """
-    cluster_fast_dataset
-
-    parameters:
-     - dataset : dataset to cluster
-     - cluster_count : TODO 
-
-    returns:
-     - updated cluster_means, cluster_sums and cluster_counts
-    """
     # Sort the dataset
     dataset.sort()
 
@@ -208,7 +183,7 @@ def cluster_fast_dataset(dataset, cluster_count):
     iter_absolute = 0
     while not np.array_equal(means, new_means):
         iter_absolute += 1
-        # print(f"Iteration {iter_absolute}")
+        print(f"Iteration {iter_absolute}")
         means = new_means.copy()
         new_means = np.zeros(cluster_count)
 
@@ -223,7 +198,7 @@ def cluster_fast_dataset(dataset, cluster_count):
             pass
         else:
             # Use the slow algorithm
-            # print("Using slow method")
+            print("Using slow method")
             cluster_counts = [0]*cluster_count
             cluster_sums = [0]*cluster_count
 
@@ -251,19 +226,18 @@ def cluster_fast_dataset(dataset, cluster_count):
     return (new_means, iters, x_sum / iters)
 
 
-def fcluster(data, k):
-    """
-    fcluster
+if __name__ == '__main__':
+    # Open our converted data and read it in
+    with open(JSON_FILENAME, 'r') as my_file:
+        full_data = json.load(my_file)
 
-    algorithm overview:
-        1: Choose k random points, assign the mean of each cluster to the value of its single data point
-        2: Assign each data point its cluster based on which mean is closest
-        3: Calculate the new means for each cluster based on the data points inside
-        4: If the new means are different than the previous means, repeat from step 2
-    """
+    # 1: Choose k random points, assign the mean of each cluster to the value of its single data point
+    # 2: Assign each data point its cluster based on which mean is closest
+    # 3: Calculate the new means for each cluster based on the data points inside
+    # 4: If the new means are different than the previous means, repeat from step 2
 
     # 1: Choose k random points (sea surface temperature)
-    # data = full_data[VARIABLES[4]]
+    data = full_data[VARIABLES[VAR_INDEX]]
 
     # Use O(n log n) time to determine cluster sums and cluster counts
     data_ordered = np.zeros(TOTAL_LAT * TOTAL_LON)
@@ -273,121 +247,25 @@ def fcluster(data, k):
         for j in range(TOTAL_LON):
             if data[i][j] is not None:
                 data_ordered[i*TOTAL_LON+j] = data[i][j]
-
+    
     data_ordered.sort()
     data_ordered = data_ordered[np.searchsorted(data_ordered, -32766):]
 
-    (means, iters, average_x) = cluster_fast_dataset(data_ordered, k)
+    (means, iters, average_x) = cluster_fast_dataset(data_ordered, 25)
 
     # We now have the final clustering - display the means of each cluster!
-    if DEBUG:
-        print(means)
-        print(iters)
-        print(average_x)
+    print(means)
+    print(iters)
+    print(average_x)
 
     # For each data point, find its cluster and make the value of the data point equal to the mean of the cluster.
     for i in range(TOTAL_LAT):
         for j in range(TOTAL_LON):
-            if data[i][j] is None:
+            if data[i][j] == None:
                 continue
             cluster = closest_search_naive(data[i][j], means)
-            data[i][j] = means[cluster]
-
-    # Since data is ordered, we can get min/max like this
-    min = data_ordered[0]
-    max = data_ordered[len(data_ordered)-1]
-
-    return (data, min, max)
-
-
-def cluster_file(filename, k, output_dir):
-    """
-    Given a filename and k value, run fcluster on the file and write to output_dir
-
-    returns the min/max values for each variable
-    """
-    if DEBUG:
-        print(filename, end=' ')
-
-    ranges = {}
-
-    with open(filename, 'r') as my_file:
-        data = json.load(my_file)
-
-    for variable in VARIABLES:
-        data[variable], min, max = fcluster(data[variable], k)
-        ranges[variable] = (min, max)
-
+            full_data[VARIABLES[VAR_INDEX]][i][j] = means[cluster]
+    
     # Now write this to a new data json so it can be mapped.
-    with open(f"{output_dir}/{basename(filename)}", 'w') as outfile:
-        json.dump(data, outfile)
-
-    return ranges
-
-
-def get_variable_ranges(results):
-    """Calculate the max/min value of each clustered variable"""
-
-    ranges = {var: {'min': [], 'max': []} for var in VARIABLES}
-
-    for result in results:
-        for var, val in result.items():
-            local_min, local_max = val
-            ranges[var]['min'].append(local_min)
-            ranges[var]['max'].append(local_max)
-
-    for var, val in ranges.items():
-        ranges[var] = (min(val['min']), max(val['max']))
-
-    return ranges
-
-
-def init(output_dir):
-    """Initialization for the algorithm"""
-
-    # Create the output directory if it doesn't exist
-    try:
-        makedirs(output_dir)
-    except OSError as e:
-        if e.errno != errno.EEXIST:
-            raise
-
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-i', '--input', help='Input JSON file')
-    parser.add_argument('-o', '--output', help='Output subdirectory')
-    parser.add_argument('-k', '--k', help='k value', default=DEFAULT_K)
-    args = parser.parse_args()
-
-    # If we specify a custom output dir, place it inside the default output directory
-    output_dir = f"{FCLUSTERED_DIRECTORY}/{args.output}" if args.output else FCLUSTERED_DIRECTORY
-
-    init(output_dir)
-
-    args.k = int(args.k)
-
-    # If input is a single file, easy case
-    if args.input and isfile(args.input):
-        print('Cluster', args.input, output_dir)
-        cluster_file(args.input, args.k)
-        exit()
-
-    # Since input isn't a single file, it's either
-    #   a) a directory, or
-    #   b) not specified
-    input_dir = args.input if args.input and isdir(args.input) else CONVERTED_DIRECTORY
-
-    print('Cluster files in', input_dir)
-
-    # Collect all the .json files in input_dir
-    files = [f"{input_dir}/{f}" for f in listdir(input_dir) if isfile(join(input_dir, f)) if f.endswith('json')]
-
-    pool = mp.Pool(mp.cpu_count())
-    results = pool.starmap(cluster_file, [(file, args.k, output_dir) for file in files])
-
-    # Calculate min/max across the clusters for each variable
-    ranges = get_variable_ranges(results)
-
-    with open(f"{output_dir}/range.json", 'w') as outfile:
-        json.dump(ranges, outfile)
+    with open('converted_data_OLD.json', 'w') as outfile:
+        json.dump(full_data, outfile)

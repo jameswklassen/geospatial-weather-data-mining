@@ -6,12 +6,9 @@ import json
 from random import randint
 import multiprocessing as mp
 import numpy as np
-from consts import TOTAL_LAT, TOTAL_LON, VARIABLES, CONVERTED_DIRECTORY, FCLUSTERED_DIRECTORY
+from consts import TOTAL_LAT, TOTAL_LON, VARIABLES, CONVERTED_DIRECTORY, FCLUSTERED_DIRECTORY, DEFAULT_K
 
 DEBUG = False
-JSON_FILENAME = 'converted_data.json'
-
-DEFAULT_K = 25
 
 
 def unique_array(arr):
@@ -307,12 +304,12 @@ def cluster_file(filename, k, output_dir):
     returns the min/max values for each variable
     """
     if DEBUG:
-        print(filename, end=' ')
-
-    ranges = {}
+        print('Clustering', filename)
 
     with open(filename, 'r') as my_file:
         data = json.load(my_file)
+
+    ranges = {}     # keep track of min/max values for each variable
 
     for variable in VARIABLES:
         data[variable], min, max = fcluster(data[variable], k)

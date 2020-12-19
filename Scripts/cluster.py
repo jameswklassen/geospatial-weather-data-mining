@@ -1,16 +1,14 @@
 from os import listdir, makedirs
-from os.path import isfile, join, basename
+from os.path import isfile, isdir, join, basename
 import argparse
 import errno
 import json
 from random import randint
 import multiprocessing as mp
 import numpy as np
-from consts import TOTAL_LAT, TOTAL_LON, VARIABLES, CONVERTED_DIRECTORY, CLUSTERED_DIRECTORY
-
+from consts import TOTAL_LAT, TOTAL_LON, VARIABLES, CONVERTED_DIRECTORY, CLUSTERED_DIRECTORY, DEFAULT_K
 
 DEBUG = False
-k = 2
 
 
 def choose_random_duplicate(clustermeans, index, backwards):
@@ -66,7 +64,7 @@ def closest_search(datapoint, clustermeans):
         return choose_random_duplicate(clustermeans, index, True)
 
 
-def cluster(data):
+def cluster(data, k):
     """
     cluster
 
@@ -134,26 +132,61 @@ def cluster(data):
                 continue
             cluster = closest_search(data[i][j], new_means)
             data[i][j] = new_means[cluster]
-    return data
+
+    min = np.nanmin(np.array(data, dtype=np.float64))
+    max = np.nanmax(np.array(data, dtype=np.float64))
+
+    return (data, min, max)
 
 
-def cluster_file(filename):
-    print('Clustering', filename)
+def cluster_file(filename, k, output_dir):
+    """
+    Given a filename and k value, run fcluster on the file and write to output_dir
+
+    returns the min/max values for each variable
+    """
+    if DEBUG:
+        print('Clustering', filename)
 
     with open(filename, 'r') as my_file:
         data = json.load(my_file)
 
+    ranges = {}     # keep track of min/max values for each variable
+
     for variable in VARIABLES:
-        data[variable] = cluster(data[variable])
+        data[variable], min, max = cluster(data[variable], k)
+        ranges[variable] = (min, max)
 
     # Write clustered data to new .json file
-    with open(f"{CLUSTERED_DIRECTORY}/{basename(filename)}", 'w') as outfile:
+    with open(f"{output_dir}/{basename(filename)}", 'w') as outfile:
         json.dump(data, outfile)
 
+    return ranges
 
-def init():
+
+def get_variable_ranges(results):
+    """Calculate the max/min value of each clustered variable"""
+
+    ranges = {var: {'min': [], 'max': []} for var in VARIABLES}
+
+    for result in results:
+        for var, val in result.items():
+            local_min, local_max = val
+            ranges[var]['min'].append(local_min)
+            ranges[var]['max'].append(local_max)
+
+    for var, val in ranges.items():
+        ranges[var] = (min(val['min']), max(val['max']))
+
+    return ranges
+
+
+def init(output_dir):
+    """Initialization for the algorithm"""
+
+    # Create the output directory if it doesn't exist
     try:
-        makedirs(CLUSTERED_DIRECTORY)
+        makedirs(output_dir)
     except OSError as e:
         if e.errno != errno.EEXIST:
             raise
@@ -162,18 +195,38 @@ def init():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', '--input', help='Input JSON file')
+    parser.add_argument('-o', '--output', help='Output subdirectory')
+    parser.add_argument('-k', '--k', help='k value', default=DEFAULT_K)
     args = parser.parse_args()
 
-    init()
+    # If we specify a custom output dir, place it inside the default output directory
+    output_dir = f"{CLUSTERED_DIRECTORY}/{args.output}" if args.output else CLUSTERED_DIRECTORY
 
-    if args.input:
-        print('Cluster', args.input)
-        cluster_file(args.input)
-    else:
-        print('Cluster files in', CONVERTED_DIRECTORY)
-        files = [f"{CONVERTED_DIRECTORY}/{f}" for f in listdir(CONVERTED_DIRECTORY) if isfile(join(CONVERTED_DIRECTORY, f))]
-        pool = mp.Pool(mp.cpu_count())
-        pool.map(cluster_file, files)
+    init(output_dir)
 
-    if DEBUG:
-        print('End of processing')
+    args.k = int(args.k)
+
+    # If input is a single file, easy case
+    if args.input and isfile(args.input):
+        print('Cluster', args.input, output_dir)
+        cluster_file(args.input, args.k)
+        exit()
+
+    # Since input isn't a single file, it's either
+    #   a) a directory, or
+    #   b) not specified
+    input_dir = args.input if args.input and isdir(args.input) else CONVERTED_DIRECTORY
+
+    print('Cluster files in', input_dir)
+
+    # Collect all the .json files in input_dir
+    files = [f"{input_dir}/{f}" for f in listdir(input_dir) if isfile(join(input_dir, f)) if f.endswith('json')]
+
+    pool = mp.Pool(mp.cpu_count())
+    results = pool.starmap(cluster_file, [(file, args.k, output_dir) for file in files])
+
+    # Calculate min/max across the clusters for each variable
+    ranges = get_variable_ranges(results)
+
+    with open(f"{output_dir}/range.json", 'w') as outfile:
+        json.dump(ranges, outfile)

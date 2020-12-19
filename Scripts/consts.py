@@ -5,6 +5,7 @@ TOTAL_LAT = 180             # number of latitude int values on earth
 DAYS_IN_YEAR = 365                  # number of days in a year
 KELVIN = 273.15             # used to convert between Kelvin and Celsius
 
+DEFAULT_K = 25
 DATA_DIRECTORY = os.getcwd() + '/../Data'
 OUTPUT_DIRECTORY = 'output'
 CONVERTED_DIRECTORY = OUTPUT_DIRECTORY + '/converted'

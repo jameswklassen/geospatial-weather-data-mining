@@ -92,7 +92,7 @@ def plot(data, variable, day, cmap, output_dir=None, ranges=None, k=None):
         norm = colors.Normalize(vmin=np.nanmin(data), vmax=np.nanmax(data))
 
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
-    plt.colorbar(sm, shrink=0.5, orientation='horizontal', pad=0.04)
+    plt.colorbar(sm, shrink=0.5, orientation='vertical', pad=0.025)
 
     file_dir = f"{output_dir}/{variable}" if output_dir else variable
     save_file(file_dir, day)

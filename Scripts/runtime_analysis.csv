@@ -1,4 +1,4 @@
-Dataset Size,Total sum of x for uniform distribution,Uniform Distribution,Total sum of x for normal distribution,Normal Distribution,Total sum of x for overlap distribution,Overlap Distribution
+Dataset Size,uniform distribution,Uniform Distribution,normal distribution,Normal Distribution,overlap distribution,Overlap Distribution
 10000,1263.541667,0.1263541667,10611.875,1.0611875,5646.333333,0.5646333333
 20000,3158.083333,0.1579041667,29265.875,1.46329375,17790.08333,0.8895041667
 30000,4851.125,0.1617041667,50974.70833,1.699156944,32231.45833,1.074381944

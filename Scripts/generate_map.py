@@ -5,12 +5,12 @@ import json
 import argparse
 import numpy as np
 import multiprocessing as mp
-from datetime import datetime
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib import colors, cm
 import cartopy.crs as ccrs
-from consts import TOTAL_LAT, TOTAL_LON, OUTPUT_DIRECTORY, IGNORED_VARIABLES, DEFAULT_K, get_english_variable_name
+
+from consts import TOTAL_LAT, TOTAL_LON, OUTPUT_DIRECTORY, IGNORED_VARIABLES, DEFAULT_K
+from utils import get_units, get_english_variable_name, day_str
 
 DEBUG = False
 
@@ -19,7 +19,7 @@ IMG_DIRECTORY = OUTPUT_DIRECTORY + '/img'
 
 OUTPUT_FORMATS = ['png']
 COLOR_LEVELS = 60
-CORNER_SMOOTHING = False
+CORNER_SMOOTHING = True
 
 lons = [i+1.375 for i in range(TOTAL_LON)]
 lats = [i-1.375 for i in range(int(TOTAL_LAT/2), int(-TOTAL_LAT/2), -1)]
@@ -92,21 +92,13 @@ def plot(data, variable, day, cmap, output_dir=None, ranges=None, k=None):
         norm = colors.Normalize(vmin=np.nanmin(data), vmax=np.nanmax(data))
 
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
-    plt.colorbar(sm, shrink=0.5, orientation='vertical', pad=0.025)
+    cb = plt.colorbar(sm, shrink=0.5, orientation='vertical', pad=0.025)
+    ticks = cb.get_ticks()
+    cb.set_ticks(ticks)
+    cb.set_ticklabels([f"{val} {get_units(variable)}" for val in ticks])
 
     file_dir = f"{output_dir}/{variable}" if output_dir else variable
     save_file(file_dir, day)
-
-
-def day_str(day):
-    """
-    Convert an integer day to a date string with format <Month Date>
-    e.g. 1 -> "Jan 1"
-    """
-    padded = f"{int(day)+1:03d}"
-
-    dt = datetime.strptime(padded, "%j")
-    return dt.strftime("%B %d")
 
 
 def generate_plots(filename, output_dir=None, ranges=None, k=None):

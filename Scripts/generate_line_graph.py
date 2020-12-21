@@ -5,9 +5,10 @@ import json
 import argparse
 import numpy as np
 import multiprocessing as mp
-from datetime import datetime
 import matplotlib.pyplot as plt
-from consts import TOTAL_LAT, TOTAL_LON, OUTPUT_DIRECTORY, IGNORED_VARIABLES, DEG, DEFAULT_K, get_units, get_english_variable_name
+
+from consts import TOTAL_LAT, TOTAL_LON, OUTPUT_DIRECTORY, IGNORED_VARIABLES, DEG, DEFAULT_K
+from utils import get_units, get_english_variable_name, day_str
 
 DEBUG = False
 
@@ -68,17 +69,6 @@ def plot(data, variable, day, output_dir=None, ranges=None, k=None):
 
     file_dir = f"{output_dir}/{variable}" if output_dir else variable
     save_file(file_dir, day)
-
-
-def day_str(day):
-    """
-    Convert an integer day to a date string with format <Month Date>
-    e.g. 1 -> "Jan 1"
-    """
-    padded = f"{int(day)+1:03d}"
-
-    dt = datetime.strptime(padded, "%j")
-    return dt.strftime("%B %d")
 
 
 def generate_plots(filename, output_dir=None, ranges=None, k=None):

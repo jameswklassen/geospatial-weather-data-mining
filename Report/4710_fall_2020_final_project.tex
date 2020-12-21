@@ -10,35 +10,6 @@
 \usepackage{listings}
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
-    
-\usepackage{listings}
-\usepackage{xcolor}
-
-\definecolor{codegreen}{rgb}{0,0.6,0}
-\definecolor{codegray}{rgb}{0.5,0.5,0.5}
-\definecolor{codepurple}{rgb}{0.58,0,0.82}
-\definecolor{backcolour}{rgb}{1,1,1}
-
-\lstdefinestyle{mystyle}{
-    backgroundcolor=\color{backcolour},   
-    commentstyle=\color{codegreen},
-    keywordstyle=\color{magenta},
-    numberstyle=\tiny\color{codegray},
-    stringstyle=\color{codepurple},
-    basicstyle=\ttfamily\footnotesize,
-    breakatwhitespace=false,         
-    breaklines=true,                 
-    captionpos=b,                    
-    keepspaces=true,                 
-    numbers=left,                    
-    numbersep=5pt,                  
-    showspaces=false,                
-    showstringspaces=false,
-    showtabs=false,                  
-    tabsize=2
-}
-
-\lstset{style=mystyle}
 
 % Our custom theorems/properties
 \newtheorem{prp}{Property}
@@ -48,6 +19,9 @@
 \newtheorem{thm}[subprp]{Theorem}
 \newtheorem{defn}[subprp]{Definition}
 
+% -----------------------------------------------------------------
+%                   end header
+%------------------------------------------------------------------
 
 \begin{document}
 \title{An Improved K-Means Clustering Algorithm for One Dimensional Data}
@@ -80,18 +54,92 @@ or Math in Paper Title or Abstract.
 \end{abstract}
 
 \begin{IEEEkeywords}
-component, formatting, style, styling, insert
+data mining, k-means, clustering, algorithm
 \end{IEEEkeywords}
 
 \section{Introduction}
-This document is a model and instructions for \LaTeX.
-Please observe the conference page limits.
+Clustering is a data mining technique used to arrange large amounts of data into distinct clusters. It is used across many fields such as image processing, pattern recognition, bioinformatics, spatial data analysis, and more. The idea of a clustering algorithm is to create clusters containing data points where every data point in the same cluster is more similar to one another than to the data points in other clusters (i.e., maximizing the intra-class similarities within a cluster and minimizing inter-class similarities between other clusters). Thus, creating a set of data points in a cluster that are locally more similar to each other than to data points in other clusters. In **Section 2** we start by describing the original k-means clustering algorithm in detail along with some of its shortcomings. We then discuss some commonly used approaches to improving the k-means clustering algorithm along with a short description of our proposed improvement. In **Section 3** we fully describe our proposed improved k-means clustering algorithm. We include pseudo code for our algorithm and a formal proof of the time complexity of a single iteration. In **Section 4** we analyze the experimental results of our algorithm and compare between both artificial data sets with different sizes and distributions and a real-world data set. In **Section 5** we use a real-world data set containing oceanic and atmospheric data set combined with our clustering algorithm to visualize geospatial data. Lastly, **Section 6** provides a summary of our findings and potential improvements of our algorithm in the future.
+
+\section{Background}
+
+One of the major approaches to clustering is the partitioning method. The partitioning method take a dataset of size *n* and partitions it into some *k* number of partitions (clusters) where *k<=n*, each cluster contains at least one data point, and each data point belongs to exactly one cluster (i.e., distinct clusters). It then evaluates the similarities between items in each cluster using a distance function through an iterative process until all data points are in their final cluster. The centre of a cluster can be calculated using the centroid or medoid methods. The centroid of a cluster is determined by calculating the average of every data point in the cluster while the medoid of a cluster is determined by calculating the median data point of the cluster. \par
+
+One of the most commonly used clustering algorithms is the k-means algorithm [cite]. This algorithm is simple to understand and implement and can be used across a large variety of problems [cite]. During the initial phase of the k-means algorithm, k random values are chosen from the dataset and assigned as the initial means of each k cluster where k is the number of clusters [cite]. In the second phase, the distance from each data point in a cluster to the centroid of every other cluster is calculated. If a data point is closer to a different cluster than the one it currently belongs to, the data point is moved to the closer cluster. After one iteration is complete and all data points have been moved, the centroids for each cluster are recomputed. This process continues until none of the data points move to a different cluster which occurs when the centroids of each partition do not change. One of the problems with the k-means algorithm is the random selection of initial cluster centroids. This random selection has two main effects. First, it makes the algorithm non-deterministic in the results it produces. This means the amount of data points in each cluster can vary greatly depending on initial means chosen [cite]. Second, for large datasets, a bad random selection of initial cluster centroids can greatly reduce the performance of the algorithm due to having to take more iterations to move data points between clusters.
+
+There have been many attempts to improve the k-means clustering algorithm....
+
+
 
 \section{Body}
 
 \subsection{Algorithm Overview}
+\noindent\fbox{
+    \parbox{225pt}{
+        \textbf{Normal K-mean algorithm:}
+        \begin{itemize}
+            \item Inputs
+                \begin{itemize}
+                    \item Dataset: All data points in any order
+                    \item K: Number of clusters
+                    \item Input means: Current set of cluster means
+                \end{itemize}
+            \item Outputs
+                \begin{itemize}
+                    \item Output means: Updated means for each cluster
+                \end{itemize}
+            \end{itemize}
+    }
+}
+\vspace{15px}
 
-\subsection{Pseudo Code}
+\textbf{Steps:}
+\begin{enumerate}
+    \item For each data point, determine which cluster it’s closest to by calculating its distance to each cluster’s mean.
+    \item Calculate the mean of each cluster using the data from step 1 as Output means
+    \item Return Output means
+\end{enumerate}
+
+
+\noindent\fbox{
+    \parbox{225pt}{
+        % Similarly define the algorithm for determining the original centroids
+        \textbf{Algorithm 1: f-cluster algorithm}
+        \begin{itemize}
+            \item Inputs
+                \begin{itemize}
+                    \item Dataset: All data points in ascending order
+                    \item K: Number of clusters
+                    \item Input means: Current set of cluster means in ascending order
+                    \item Cluster sums: The sum of data points in each cluster
+                    \item Cluster counts: The number of data points in each cluster
+                \end{itemize}
+            \item Outputs
+                \begin{itemize}
+                    \item Output means: Updated means for each cluster
+                    \item Cluster sums: Updated sums of data points in each cluster
+                    \item Cluster counts: Updated numbers of data points in each cluster
+                \end{itemize}
+        \end{itemize}
+    }
+}
+\vspace{15px}
+
+\textbf{Steps:}
+\begin{enumerate}
+    \item Determine the indexes that divide each cluster using the Cluster counts array.
+    \item Compute the average of the cluster means adjacent to the cluster borders (e.g. (Input means[2]+Input means[3])/2)
+    \item Repeat
+    \item If the data point immediately before the cluster border is greater than or equal to the corresponding adjacent cluster average, move the cluster border to the left until that is no longer the case. Update the sums and counts for each cluster as you do this. Note: We do not update the mean of each cluster until the end.
+    \item If the data point immediately after the cluster border is less than the corresponding adjacent cluster average, move the cluster border to the right until that is no longer the case. Update the sums and counts for each cluster as you do this.
+    \item If the data point immediately before the cluster border is less than the corresponding adjacent cluster average, AND the data point immediately after the cluster border is greater than or equal to the corresponding adjacent cluster average, do not move the cluster border and skip to the next cluster border.
+\end{enumerate}
+
+\textbf{For each cluster border:}
+\begin{enumerate}
+    \item Calculate the updated mean of each cluster as the updated sum divided by the updated count as Output means.
+    \item Delete any clusters that have zero items
+    \item Return Output means, Cluster sums, Cluster counts.
+\end{enumerate}
 
 \subsection{Proof of Correctness}
 
@@ -108,9 +156,7 @@ To prove correctness of the algorithm, we must prove the following properties
 \begin{prp}\label{closest-centroid}Each item in the dataset will be assigned to the cluster with the closest centroid, and\end{prp}
 \begin{prp}\label{border-cross}The cluster borders cannot cross each other (even if the algorithm is done in parallel), as this would cause sum/count calculations to be incorrect.\end{prp}
 
-\textbf{Setup}
-
-Algorithm inputs:
+\subsubsection{Algorithm inputs}
 \begin{itemize}
 \item $D = \{d_{11}, d_{12}, \dots , d_{1n_1}, \dots, d_{kn_k}\}$ where the dataset $D$ contains elements $d_{ij}$ where $i$ is the cluster and $j$ is the index within the cluster. 
 \item $k$, the number of cluster where $k \geq 2$
@@ -120,6 +166,7 @@ Algorithm inputs:
 \item $N_{\text{sum}} = {n_1 + \dots + n_k}$ where $N_{\text{sum}}$ is the total number of data points in $D$
 \end{itemize}
 
+\subsubsection{}
 In this proof we use the concept of cluster borders separating the data set into its clusters.
 This is an integral concept as the algorithm leans heavily on it.
 In order to better visualize the intuition of the algorithm, we model the data and associated clusters as a sorted list of data points in clusters separated by cluster borders, i.e. the first border separates clusters 1 and 2, etc.. The set of all cluster borders positions is $B = b_1, \dots, b_{k-1}$. Visually, this looks like the following diagram:
@@ -139,6 +186,7 @@ D=
 
 \noindent\fbox{
     \parbox{225pt}{
+        \subsubsection{Proof outline for Property \ref{closest-centroid}}
         \textbf{Proof outline for Property \ref{closest-centroid}}
         \begin{proofprp}\end{proofprp}
 
@@ -295,6 +343,67 @@ as that would imply that an element to the right of $b_{i+1}$ was closer to $c_{
 
 \textbf{Conclusion:}
 By properties 2.1 and 2.2, cluster borders cannot cross each other, even if the f-cluster algorithm is executed in parallel, and the maximum number of spots a cluster border $b_i$ can be moved is $\max(n_{i-1}, n_{i+1}-1)$
+
+\subsection{Empirical Runtime Analysis}
+Since each iteration of the f-cluster algorithm produces identical results to the normal k-means algorithm,
+it logically follows that it will take the exact same number of iterations to converge to its final result.
+The number of iterations is known to scale with the size of the dataset,
+ but is still an area of active research and is highly variable depending on the initial conditions
+%  TODO:
+ (Note: reference a paper that shows a bound on the number of iterations here),
+ and so our analysis of the total runtime will simply include iterations as a variable $i$. 
+ \par
+
+We also won’t be giving any mathematical proofs of the run times quoted here as the proof would likely be non-trivial enough to be out of the scope of this project.
+\par
+
+For each iteration and each cluster border, we must check if the cluster border needs to be moved, and then move it into the correct position if necessary.
+If we say that the total amount the cluster borders moved plus $k-1$ (to account for checking if each cluster border needs to be moved) is $x$,
+then the total number of operations done for a single iteration is simply $O(x)$.
+
+For convenience, define $N_\text{sum} = n_1 + \dots + n_k$, so that $N_\text{sum}$ is the number of data points in the dataset
+
+Our first observation is that $x < N_\text{sum}$:
+First, note that the maximum number of spots a cluster border $b_i$ can move is $\max(n_{i-1}, n_{i+1}-1)$ as was shown in part 2 of the proof of correctness.
+Assume the worst case scenario — that every border except the last moves as far to the left as it can go,
+and the last border goes to either the left or right. $b_1$ will move $n_1-1$ spots to the left, $b_2$ will move $n_2-1$ spots to the left, etc... and the last border will move $\max(n_{k-1}-1, n_k-1)$ spots, either to the left or right depending on which is larger.
+So we have 
+
+\begin{equation}\begin{aligned}
+    x = (n_1-1)+(n_2-1) + \dots + (n_{k-2}-1) + 
+    \\ \max(n_{k-1}-1, n_{k-1})+(k-1) \\ 
+    = n_1 + n_2 + \dots + n_{k-2} + \max(n_{k-1}-1, n_k-1) + 1 < n_1 + n_2 + \dots + n_{k-2} + \max(n_{k-1}, n_k) < n_1 + n_2 + \dots + n_{k-1} + n_k
+\end{aligned}
+\end{equation}
+
+thus proving the property that $x < N_\text{sum}$.
+
+As we noted in the proof of correctness, there are at most 3 possibilities for which centroid a given data point is closest to.
+This implies a different optimized k-means algorithm in which you only check the nearest 2 or 3 centroids, instead of checking all k centroids as naive k-means does.
+The fact that $x < N_\text{sum}$ proves that our algorithm is faster than even this optimized version of k-means.
+
+For the whole algorithm including all iterations, the total number of operations done is simply the sum of x values over all iterations,
+which we denote $x_\text{sum}$, making the total number of operations for the clustering portion of k-means $O(x_\text{sum})$.
+Below is a plot of how $x_\text{sum}$ scales with the size of the dataset, for a few different distributions of datasets.
+
+
+% TODO insert figure
+
+As we can clearly see, $x_\text{sum}$ scales linearly with the size of the dataset, although the slope changes based on the distribution.
+This is simply the big $O$ constant scaling factor, and we can safely ignore it.
+We can then conclude that the actual clustering part of K-means, including all iterations,takes a total of $O(n)$ operations.
+Of course, the base requirement to use f-cluster is that the dataset is sorted.
+However since real data generally doesn’t come pre-sorted, we can consider the full runtime of clustering a dataset with a size of n using f-cluster to be O(n log n).
+This is in stark contrast to other optimized K-means algorithms which take $O(n^2)$ time. (Reference paper with $O(n^2)$ optimized k-means here).
+
+As a side note, if one were to zoom in on the start of the graph posted above, one would notice that the slope isn’t entirely constant.
+However this is okay because it quickly converges towards a constant slope as the size of the dataset increases. Below is a graph of $x_\text{sum}/N_\text{sum}$:
+
+In addition, as with normal K-means, our algorithm is parallelizable.
+As we noted in the proof of correctness, the cluster dividers cannot cross each other and interfere with sum/count calculations.
+This holds true even when done in parallel, and as such parallelizing the algorithm is possible.
+If you parallelized both the sorting and the clustering steps (it would be pointless to parallelize just one), 
+the total runtime to sort and cluster the data would be $O(\log n + n/(k-1)) = O(n/k)$ (Note: Reference a paper here that mentions the complexity of parallelized sorting algorithms).
 
 
 \end{document}

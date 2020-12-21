@@ -18,11 +18,6 @@ VARIABLES = [
     'two_metre_temperature',
     'mean_sea_level_pressure',
     'sea_surface_temperature',
-    # 'total_cloud_cover'
-]
-
-IGNORED_VARIABLES = [
-    'total_cloud_cover',
 ]
 
 DEG = u'\N{DEGREE SIGN}'

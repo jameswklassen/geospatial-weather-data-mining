@@ -47,8 +47,6 @@ def save_file(dir, name):
 def color_map(var):
     if var == 'mean_sea_level_pressure':
         return cm.BuPu
-    elif var == 'total_cloud_cover':
-        return cm.get_cmap('Blues_r')
     else:
         return cm.jet
 

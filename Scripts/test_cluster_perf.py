@@ -4,8 +4,9 @@ import multiprocessing as mp
 import argparse
 import math
 from random import randint
-from consts import TOTAL_LAT, TOTAL_LON, VARIABLES
+
 from fcluster_dataset import cluster_fast_dataset
+
 
 def main():
     # We want to test how the average x value changes depending on the characteristics of the dataset.
@@ -102,7 +103,7 @@ def do_overlap_tests(iterations, size, k):
 
         (_, _, x_avg) = cluster_fast_dataset(dataset, k)
         x_sum += x_avg
-    
+
     print(f"The average x value for a set of overlapped normal distributions with mids {mids} and std. deviation {stddev} with size {size} is approximately {x_sum/iterations}")
 
 

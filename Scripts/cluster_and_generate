@@ -1,5 +1,13 @@
 #!/bin/sh
 
+# ---------------------------------------------
+# cluster_and_generate
+#   helper script to run various steps to generate visualizations
+#   - runs fcluster on all data
+#   - generates figures based on clustered data
+#   - converts image directories to .mp4 files
+# ---------------------------------------------
+
 K_VALUES="5 6 7 8 9 10"
 
 CONVERTED_DATA_DIR="output/converted"

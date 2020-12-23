@@ -1,7 +1,12 @@
 #!/bin/sh
 
-NUM_LOOPS=4
+# ---------------------------------------------
+# loop_videos
+#  Finds all .mp4 files in DIRECTORY 
+#  and loops each one NUM_LOOPS times
+# ---------------------------------------------
 
+NUM_LOOPS=4
 POSTFIX="looped"
 DIRECTORY="${1:-.}"
 EXT="mp4"

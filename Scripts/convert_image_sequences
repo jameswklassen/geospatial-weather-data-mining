@@ -1,5 +1,11 @@
 #!/bin/sh
 
+# ---------------------------------------------
+# convert_image_sequences
+#   Compiles a sequence of images in OUTPUT_DIR
+#   into a single video file with extension EXT
+# ---------------------------------------------
+
 BASE_DIR=$(pwd)
 VARIABLES="
     two_metre_temperature
@@ -8,14 +14,14 @@ VARIABLES="
 
 OUTPUT_DIR="${1:-output/img}"   # directory containing the images
 FRAMERATE="${2:-30}"            # desired output framerate
-EXT_OUT="mp4"                   # extension of the file ffmpeg should output
+EXT="mp4"                       # extension of the file ffmpeg should output
 OVERWRITE=false                 # should ffmpeg blindly overwrite files?
 
-echo "Creating $FRAMERATE FPS $EXT_OUT image sequences in $OUTPUT_DIR"
+echo "Creating $FRAMERATE FPS $EXT image sequences in $OUTPUT_DIR"
 
 for variable in $VARIABLES; do
     cd "$OUTPUT_DIR/$variable"
-    filename="_${variable}_$FRAMERATE.$EXT_OUT" 
+    filename="_${variable}_$FRAMERATE.$EXT" 
     echo "Creating $filename"
     ffmpeg ${OVERWRITE:+-y} -hide_banner -loglevel panic -framerate $FRAMERATE -i %d.png "$filename"
 

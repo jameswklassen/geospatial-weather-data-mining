@@ -1,6 +1,6 @@
 # Visuals
 
-- [Example of visualization output](map/k=7/two_metre_temperature)
+- [Example of visualization output](examples/map.png)
 - [Example of visualization video](map/k=7/two_metre_temperature/_two_metre_temperature_30.mp4)
 - [Visualization of performance analysis](performance)
 
@@ -13,9 +13,9 @@ Visualizations have been generated for with k values from 5-10. We visualize the
 1. Map
 2. Line graph
 
-![Map Visualization Example](map/k=7/two_metre_temperature/0.png)
+![Map Visualization Example](examples/map.png)
 
-![Line Visualization Example](line/k=7/two_metre_temperature/0.png)
+![Line Visualization Example](examples/line.png)
 
 ## Performance analysis visualization
 

@@ -1,13 +1,26 @@
+from os import makedirs
+import errno
 import pandas as pd
 import matplotlib.pyplot as plt
 
+from consts import DATA_DIRECTORY, OUTPUT_DIRECTORY
+
 FILENAMES = ['operations.csv', 'operations_ratio.csv']
-IMG_DIRECTORY = 'output'
+IMG_DIRECTORY = f"{OUTPUT_DIRECTORY}/performance"
 OUTPUT_FORMATS = ['png']
+
+INPUT_DIRECTORY = f"{DATA_DIRECTORY}/performance"
 
 
 def save_file(name):
     """Save the current plot as an .svg in the image directory"""
+
+    dir_path = f"{IMG_DIRECTORY}"
+    try:
+        makedirs(dir_path)
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise
 
     for output_format in OUTPUT_FORMATS:
         path = f"{IMG_DIRECTORY}/{name}.{output_format}"
@@ -19,7 +32,7 @@ def save_file(name):
 
 def operations():
     title = 'Number of operations'
-    input_file = 'operations.csv'
+    input_file = f'{INPUT_DIRECTORY}/operations.csv'
     output_file = 'operations'
 
     data = pd.read_csv(input_file, sep=',', header=0)
@@ -46,7 +59,7 @@ def operations():
 
 def operations_ratio():
     title = 'Ratio of operations over dataset size'
-    input_file = 'operations_ratio.csv'
+    input_file = f'{INPUT_DIRECTORY}/operations_ratio.csv'
     output_file = 'operations_ratio'
 
     data = pd.read_csv(input_file, sep=',', header=0)

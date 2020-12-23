@@ -4,8 +4,7 @@ BASE_DIR=$(pwd)
 VARIABLES="
     two_metre_temperature
     sea_surface_temperature
-    mean_sea_level_pressure
-    total_cloud_cover"
+    mean_sea_level_pressure"
 
 OUTPUT_DIR="${1:-output/img}"   # directory containing the images
 FRAMERATE="${2:-30}"            # desired output framerate

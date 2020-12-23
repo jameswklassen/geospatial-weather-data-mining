@@ -8,6 +8,7 @@ from consts import TOTAL_LAT, TOTAL_LON, VARIABLES
 from fcluster import cluster_fast_dataset
 import datetime
 
+
 def main():
     # We want to test how the average x value changes depending on the characteristics of the dataset.
     # Characteristics to test:

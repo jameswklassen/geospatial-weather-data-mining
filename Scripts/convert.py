@@ -54,7 +54,6 @@ def process_data(input_filename, day, lat_start, lat_end):
     two_metre_temperature = ctd.variables['t2m']
     mean_sea_level_pressure = ctd.variables['msl']
     sea_surface_temperature = ctd.variables['sst']
-    total_cloud_cover = ctd.variables['tcc']
 
     for lat in range(lat_start, lat_end):
         for lon in range(TOTAL_LON):
@@ -69,7 +68,6 @@ def process_data(input_filename, day, lat_start, lat_end):
                 data['two_metre_temperature'][lat][lon] = mean(two_metre_temperature, day, lat, lon) - KELVIN
                 data['mean_sea_level_pressure'][lat][lon] = mean(mean_sea_level_pressure, day, lat, lon) / 1000
                 data['sea_surface_temperature'][lat][lon] = mean_sea_surface_temperature - KELVIN
-                data['total_cloud_cover'][lat][lon] = mean(total_cloud_cover, day, lat, lon)
 
     return data
 

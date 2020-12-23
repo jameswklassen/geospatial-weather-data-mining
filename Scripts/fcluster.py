@@ -102,14 +102,8 @@ def closest_search_no_dups(datapoints, k, means, cluster_sums, cluster_count):
     # Now we can start the main loop: For each cluster, determine its new divider location
     # and modify its sum and count.
     for i in range(k-1):
-        # Take the old divider location between cluster[i] and cluster[i+1].
-        # Is it in the same place, further to the left or to the right?
-        # If it's in the same place, then datapoints[dividerpos-1] < cluster_inbetweens[i] and datapoints[dividerpos] > cluster_inbetweens[i].
-        # print(f"data[divide[i]-1]: {datapoints[dividerpos[i]-1]}, cluster_inbetween[i]: {cluster_inbetweens[i]}, data[divide[i]]: {datapoints[dividerpos[i]]}")
-        if datapoints[dividerpos[i]-1] < cluster_inbetweens[i] and datapoints[dividerpos[i]] >= cluster_inbetweens[i]:
-            # print("Divider is in the same place. Rejoice! Do nothing.")
-            continue
-
+        n += 1
+        
         # If it's to the left, then datapoints[dividerpos-1] >= cluster_inbetweens[i]
         # If it's to the right, then 
         if datapoints[dividerpos[i]-1] >= cluster_inbetweens[i]:
@@ -129,7 +123,7 @@ def closest_search_no_dups(datapoints, k, means, cluster_sums, cluster_count):
 
                 j -= 1
                 n += 1
-        else:
+        elif datapoints[dividerpos[i]] < cluster_inbetweens[i]:
             # print("It's to the right!")
             # Iterate until we have that datapoints[dividerpos] >= cluster_inbetweens[i]
             # Each time, we "move it to the right" by 1, we need to adjust the cluster sum and cluster count
@@ -146,10 +140,7 @@ def closest_search_no_dups(datapoints, k, means, cluster_sums, cluster_count):
                 j += 1
                 n += 1
 
-            # j is the new divider position. We don't need to store it though so it's fine.
-            dividerpos[i] = j
-
-    return (cluster_sums, cluster_count, n / (k-1))
+    return (cluster_sums, cluster_count, n)
 
 
 def cluster_fast_dataset(dataset, cluster_count):
@@ -216,7 +207,7 @@ def cluster_fast_dataset(dataset, cluster_count):
             )
 
             iters += 1
-            x_sum += x + 1
+            x_sum += x
             pass
         else:
             # Use the slow algorithm
@@ -245,7 +236,7 @@ def cluster_fast_dataset(dataset, cluster_count):
 
     # End of while loop - we've reached a stable configuration
     # Return new means and average x value
-    return (new_means, iters, x_sum / iters)
+    return (new_means, iters, x_sum)
 
 
 def fcluster(data, k):

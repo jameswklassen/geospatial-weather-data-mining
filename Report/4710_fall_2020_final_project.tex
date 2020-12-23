@@ -24,13 +24,12 @@
 
 % Our custom theorems/properties
 \newtheorem{prp}{Property}
-\newtheorem{proofprp}{}
+% \newtheorem{proofprp}{}
 
-\newtheorem{subprp}{Property}[proofprp]
+% TODO
+\newtheorem{subprp}{Property}[prp]
 \newtheorem{thm}[subprp]{Theorem}
 \newtheorem{defn}[subprp]{Definition}
-
-% \overfullrule=1mm
 
 % -----------------------------------------------------------------
 %                   end header
@@ -63,9 +62,7 @@ loewent4@myumanitoba.ca}
 \maketitle
 
 \begin{abstract}
-This document is a model and instructions for \LaTeX.
-This and the IEEEtran.cls file define the components of your paper [title, text, heads, etc.]. *CRITICAL: Do Not Use Symbols, Special Characters, Footnotes, 
-or Math in Paper Title or Abstract.
+Clustering is a widely used technique for data pre-processing, mining, and analysis. The k-means clustering algorithm is commonly used because of its simplicity and flexibility to work in many data mining domains. Despite being commonly used, the k-means algorithm suffers from non-deterministic results and run times that vary greatly depending on the initial selection of cluster centroids. There have been many proposed improvements to the k-means algorithm. We propose the f-cluster algorithm which combines concepts from the k-means algorithm with an additional focus on the concepts of the borders dividing clusters. What we find is deterministic results with greatly improved run time over the k-means algorithm.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -84,7 +81,7 @@ There are three major techniques for clustering: partitioning methods, hierarchi
 
 \subsection{k-means Clustering Algorithm}
 
-The k-means algorithm is a widely used clustering algorithm that is easy to understand and implement and can be used across a large variety of problems [1, 2, 3, 4, 5]. We have included the pseudo code of the k-means algorithm as Algorithm 1 for reference. There are two phases in the k-means algorithm. During the initial phase, $k$ random values are chosen from the dataset and assigned as the initial centroids of each of the clusters where $k$ is the number of clusters [1]. In the second phase, the distance from each data point in a cluster to the centroid of every other cluster is calculated. If a data point is closer to a different cluster than the one it currently belongs to, the data point is moved to the closest cluster. After one iteration is complete and all data points have been moved, the centroids for each cluster are recomputed. This process continues until none of the data points move to a different cluster which occurs when the centroids of each cluster do not change. One of the issues with the k-means algorithm is the random selection of initial cluster centroids. This random selection has two main effects on the behaviour of the algorithm. First, it makes the algorithm non-deterministic in the final clusters it produces [1]. This means the number of data points in each cluster can vary greatly depending on the initial centroids chosen. Second, for large datasets, some random selections of initial centroids can greatly reduce the performance of the algorithm as more iterations are required to move data points between clusters [1, 2].
+The k-means algorithm is a widely used clustering algorithm that is easy to understand and implement and can be used across a large variety of problems \cite{b1, b2, b3, b4, b5}. We have included the pseudo code of the k-means algorithm as Algorithm 1 for reference. There are two phases in the k-means algorithm. During the initial phase, $k$ random values are chosen from the dataset and assigned as the initial centroids of each of the clusters where $k$ is the number of clusters \cite{b1}. In the second phase, the distance from each data point in a cluster to the centroid of every other cluster is calculated. If a data point is closer to a different cluster than the one it currently belongs to, the data point is moved to the closest cluster. After one iteration is complete and all data points have been moved, the centroids for each cluster are recomputed. This process continues until none of the data points move to a different cluster which occurs when the centroids of each cluster do not change. One of the issues with the k-means algorithm is the random selection of initial cluster centroids. This random selection has two main effects on the behaviour of the algorithm. First, it makes the algorithm non-deterministic in the final clusters it produces \cite{b1}. This means the number of data points in each cluster can vary greatly depending on the initial centroids chosen. Second, for large datasets, some random selections of initial centroids can greatly reduce the performance of the algorithm as more iterations are required to move data points between clusters \cite{b1, b2}.
 
 \begin{algorithm}\label{alg-1}
     \caption{k-means clustering algorithm}
@@ -111,9 +108,9 @@ The k-means algorithm is a widely used clustering algorithm that is easy to unde
 
 \subsection{Related Work}
 
-There have been many improvements to the k-means clustering algorithm [1, 2, 3]. The global k-means clustering algorithm modifies the k-means algorithm by minimizing the distance between data points within the same cluster using the k-means algorithm as a local search procedure [2]. In this algorithm, the local k-means algorithm starts with a single cluster and calculates the centroid of this cluster. The global k-means algorithm then applies the k-means algorithm sequentially on an increasingly large number of clusters to solve a local problem [2]. At the start of each local search, the cluster centroids are initially placed at the currently most optimal position, which is determined by the centroids calculated in the previous iteration’s local search [2]. This improves performance by reducing the number of data points that have to be moved between clusters. The global k-means algorithm produces deterministic results because it starts with a single cluster and computed centroid. It also has improved performance over the k-means algorithm because it always passes the most recently calculated centroid(s) of the current iteration to the next iteration, reducing the number of data points that are moved between clusters [2].
+There have been many improvements to the k-means clustering algorithm \cite{b1, b2, b3}. The global k-means clustering algorithm modifies the k-means algorithm by minimizing the distance between data points within the same cluster using the k-means algorithm as a local search procedure \cite{b2}. In this algorithm, the local k-means algorithm starts with a single cluster and calculates the centroid of this cluster. The global k-means algorithm then applies the k-means algorithm sequentially on an increasingly large number of clusters to solve a local problem \cite{b2}. At the start of each local search, the cluster centroids are initially placed at the currently most optimal position, which is determined by the centroids calculated in the previous iteration’s local search \cite{b2}. This improves performance by reducing the number of data points that have to be moved between clusters. The global k-means algorithm produces deterministic results because it starts with a single cluster and computed centroid. It also has improved performance over the k-means algorithm because it always passes the most recently calculated centroid(s) of the current iteration to the next iteration, reducing the number of data points that are moved between clusters \cite{b2}.
 
-The improved k-means algorithm proposed by K. Nazeer and M. P. Sebastian [1] modifies the original k-means algorithm using a technique to systematically determine the initial centroids of each cluster with better accuracy than when selecting them randomly [1]. The clustering process is then applied to the initial clusters using a heuristic approach for improved efficiency [1]. In this heuristic approach, the distances from each data point in a cluster to their nearest cluster are saved and passed to the next iteration. In the next iteration the distances from the previous iteration are compared to the new distances from each data point in the cluster to the cluster they are closest to. If the distance calculated in the current iteration is less than or equal to the distance calculated in the previous iteration then the data point stays in its current cluster. Otherwise, the distance from the data point to every other cluster is calculated to find the new closest cluster to the data point.
+The improved k-means algorithm proposed by K. Nazeer and M. P. Sebastian \cite{b1} modifies the original k-means algorithm using a technique to systematically determine the initial centroids of each cluster with better accuracy than when selecting them randomly \cite{b1}. The clustering process is then applied to the initial clusters using a heuristic approach for improved efficiency \cite{b1}. In this heuristic approach, the distances from each data point in a cluster to their nearest cluster are saved and passed to the next iteration. In the next iteration the distances from the previous iteration are compared to the new distances from each data point in the cluster to the cluster they are closest to. If the distance calculated in the current iteration is less than or equal to the distance calculated in the previous iteration then the data point stays in its current cluster. Otherwise, the distance from the data point to every other cluster is calculated to find the new closest cluster to the data point.
 
 \section{Modified Approach}
 
@@ -205,40 +202,31 @@ Algorithm 4 is the complete algorithm that combines Algorithm 2 and Algorithm 3.
     Steps:
         \begin{enumerate}
             \item Use Algorithm 2 to determine the initial cluster centroids, cluster sums, and cluster data point counts
-            \item Use output from Algorithm 2 as input to Algorithm 3 to determine the final cluster centroids
+            \item Use output from Algorithm 2 as input to Algorithm 3 to determine $C$ 
         \end{enumerate}
 \end{algorithm}
 
 
 \subsection{Proof of Correctness}
 
-This algorithm needs a couple requirements in order to function properly:
-\begin{enumerate}
-    \item There must be no duplicate cluster centroids
-    \item Every cluster must contain at least one item in it
-\end{enumerate}
+In this section we prove the following two properties of the f-cluster algorithm to show that the algorithm always produces the correct results:
+\begin{prp}\label{closest-centroid}Each data point in the dataset will be assigned to the cluster it is closest to\end{prp}
+\begin{prp}\label{border-cross}The cluster borders cannot cross each other as this would cause the sum and count calculations to be incorrect.\end{prp}
 
-Note: if a data point is the same distance from two cluster centroids, this algorithm favours the cluster with the larger centroid.
-This case is ignored in this proof, as the chance of this happening is vanishingly small in real world datasets due to floating point precision.
+For the algorithm to work correctly we assume that there are no duplicate centroids. When a data point has an equal distance to two different centroids we assign the data point to the cluster with the larger of the two centroids. This behaviour is omitted from the proof because the probability of two distances being equal considering floating-point precision is very low. We also assume that there are at least two clusters, that is $k \geq 2$. For future reference in this proof, cluster borders are positions that separate the data points into clusters by defining where clusters begin and end in the dataset.
 
-To prove correctness of the algorithm, we must prove the following properties
-\begin{prp}\label{closest-centroid}Each item in the dataset will be assigned to the cluster with the closest centroid, and\end{prp}
-\begin{prp}\label{border-cross}The cluster borders cannot cross each other (even if the algorithm is done in parallel), as this would cause sum/count calculations to be incorrect.\end{prp}
-
-\subsubsection{Algorithm inputs}
+\subsubsection{Setup}
+Algorithm inputs:
 \begin{itemize}
-\item $D = \{d_{11}, d_{12}, \dots , d_{1n_1}, \dots, d_{kn_k}\}$ where the dataset $D$ contains elements $d_{ij}$ where $i$ is the cluster and $j$ is the index within the cluster. 
-\item $k$, the number of cluster where $k \geq 2$
-\item $C = \{c_1, \dots, c_k\}$ where $C$ is a set containing the centroids of each cluster where each $c$ is unique and $c_1 < c_2 < \dots < c_k$. This sequence is constant until the very end of the algorithm.
-\item $S = \{s_1, \dots, s_k\}$ where $S$ is a set containing the sums of data points in each cluster
-\item $N = \{n_1, \dots, n_k\}$ where $N$ is a set containing the number of data points in each cluster
-\item $N_{\text{sum}} = {n_1 + \dots + n_k}$ where $N_{\text{sum}}$ is the total number of data points in $D$
+\item $D = \{d_{11}, d_{12}, \dots , d_{1n_1}, \dots, d_{kn_k}\}$: Dataset with elements $d_{ij}$ where $i$ is the cluster and $j$ is the index within the cluster
+\item $k$: Number of clusters where $k \geq 2$
+\item $C = \{c_1, \dots, c_k\}$: Set containing the centroids of each cluster where each $c$ is unique and $c_1 < c_2 < \dots < c_k$
+\item $S = \{s_1, \dots, s_k\}$: Set containing the sums of data points in each cluster
+\item $N = \{n_1, \dots, n_k\}$: Set containing the number of data points in each cluster
+% \item $N_{\text{sum}} = {n_1 + \dots + n_k}$ where $N_{\text{sum}}$ is the total number of data points in $D$
 \end{itemize}
 
-\subsubsection{}
-In this proof we use the concept of cluster borders separating the data set into its clusters.
-This is an integral concept as the algorithm leans heavily on it.
-In order to better visualize the intuition of the algorithm, we model the data and associated clusters as a sorted list of data points in clusters separated by cluster borders, i.e. the first border separates clusters 1 and 2, etc.. The set of all cluster borders positions is $B = b_1, \dots, b_{k-1}$. Visually, this looks like the following diagram:
+To better visualize the intuition of the algorithm, we model the data and associated clusters as a sorted list of data points in clusters separated by cluster borders, i.e. the first border separates clusters 1 and 2, etc.. The set of all cluster borders positions is defined as$B = \{b_1, \dots, b_{k-1}\}$. The algorithm inputs and borders can be visually represented by Eq.(1).
 
 \begin{equation}\label{alg-vis}\begin{aligned}
 D=
@@ -253,233 +241,104 @@ D=
 \end{aligned}
 \end{equation}
 
-% \noindent\fbox{
-%     \parbox{225pt}{
-%         \subsubsection{Proof outline for Property \ref{closest-centroid}}
-%         \textbf{Proof outline for Property \ref{closest-centroid}}
-%         \begin{proofprp}\end{proofprp}
+\subsubsection{Outline of Proof of Property \ref{closest-centroid}}
 
-%         % \textbf{Property 1.1:}
-%         \begin{subprp}\label{1-1}
-%             Data points can only be closest to one of the clusters they’re adjacent to or inside of, i.e. $d_{ij}$ is closest to either $c_{i-1}, c_i$ or $c_{i+1}$
-%         \end{subprp}
+\textbf{Property 1.1}: Data points can only be closest to one of the clusters they are adjacent to or belong to, i.e. $d_{ij}$ is closest to either $c_{i-1}, c_i$ or $c_{i+1}$.
+    
+\textbf{Definition 1.2}: A cluster border $b_i$ is in the correct position if all data points before $b_i$ are closer to $c_i$ than $c_{i+1}$, and all data points after $b_i$ are closer to $c_{i+1}$ than $c_i$.
 
-%         % \textbf{Definition 1.2:}
-%         \begin{defn}\label{1-2}
-%             Definition: a cluster border $b_i$ is in the correct location if all data points before $b_i$ are closer to $c_i$ than $c_{i+1}$, and all data points after $b_i$ are closer to $c_{i+1}$ than $c_i$.
-%         \end{defn}
+\textbf{Property 1.3}: An equivalent statement to Definition 1.2: If a cluster border $b_i$ is in the correct position, the item $x$ immediately before $b_i$ satisfies $x < (c_i+c_{i+1})/2$, and the item $y$ immediately after $b_i$ satisfies $y \geq (c_i+c_{i+1})/2$.
 
-%         % \textbf{Property 1.3:}
-%         \begin{subprp}\label{1-3}
-%             An equivalent statement: If a cluster border $b_i$ is in the correct location, the item $x$ immediately before $b_i$ satisfies $x < (c_i+c_{i+1})/2$, and the item $y$ immediately after $b_i$ satisfies $y > (c_i+c_{i+1})/2$
-%         \end{subprp}
-        
-%         % \textbf{Property 1.4:}
-%         \begin{subprp}\label{1-4}
-%             Once the first $i$ cluster borders have been put in the correct location, it follows that all data points before $b_i$ have been assigned to the correct cluster
-%         \end{subprp}
-        
-%         % \textbf{Property 1.5:}
-%         \begin{subprp}\label{1-5}
-%             Once the last cluster border $b_{k-1}$ has been put in the correct location, all data points after $b_{k-1}$ have been correctly assigned to the last cluster.
-%         \end{subprp}
+\textbf{Property 1.4}: Once the first $i$ cluster borders have been put in the correct position, it follows that all data points before $b_i$ have been assigned to the correct cluster.
 
-%         \textbf{Conclusion:}
-%         By properties 1.4 and 1.5, once the algorithm terminates, all data points have been assigned to the correct cluster.
-%     }
-% }
-% \vspace{15px}
+\textbf{Property 1.5}: Once the last cluster border $b_{k-1}$ has been put in the correct position, all data points after $b_{k-1}$ have been correctly assigned to the last cluster.
 
-\textbf{Proof of Property \ref{closest-centroid}}
+\textbf{Conclusion}: By Property 1.4 and Property 1.5, once the algorithm terminates, all data points have been assigned to the correct cluster.
+
+
+\subsubsection{Proof of Property \ref{closest-centroid}}
 
 Recall that:
 \begin{enumerate}
 \item $c_1 < c_2 < \dots < c_k$
-\item $d_{11} \leq d12 \leq \dots \leq d_{1n_1} \leq \dots \leq d_{k1} \leq \dots \leq d_{kn_k}$
-Due to the properties of means, we know that for any cluster $i$:
-$d_{i1} \leq c_i \leq din_i$
+\item $d_{11} \leq d_{12} \leq \dots \leq d_{1n_1} \leq \dots \leq d_{k1} \leq \dots \leq d_{kn_k}$
+\item Due to the properties of means, we know that for any cluster $i, d_{i1} \leq c_i \leq d_{in_i}$
 \end{enumerate}
 
-\textbf{Property \ref{1-1}}
-We are now going to prove that data points can only be closest to one of the clusters they’re adjacent to or inside of,
-i.e. $d_{ij}$ is closest to either $c_{i-1}$, $c_i$, or $c_{i+1}$.
+\textbf{Property 1.1}: We now prove that data points can only be closest to one of the clusters they are adjacent to or belong to, i.e. $d_{ij}$ is closest to either $c_{i-1}$, $c_i$, or $c_{i+1}$. Given a data point $d_{ij}$ in a cluster $i$ where $j$ is the index of the data point inside the cluster, we consider which cluster centroids $d_{ij}$ could be closest to. Let $i=1$, then it follows that $d_{1j}$ is either closest to $c_1$ or $c_2$ since $c_3 > c_2$. Intuitively, it would not be the case that $d_{1j}$ is closer to $c_3$ than $c_2$ (or any centroid higher larger than $c_3$). Stating this more formally, we want to minimize the L2 Norm in one dimension $|d_{1i} - c_a|$ over the variable $a$. By the algebraic definition of absolute values, $|d_{1i}-c_3| = c_3-d_{1i}$ because $c_3 > d_{1i}$ and $|d_{1i}-c_2| = c_2-d_{1i}$ because $c_2 \geq d_{1i}$. Then it follows that $|d_{1i} - c_3| > |d_{1i} - c_2| \iff c_3 - d_{1i} > c_2 - d_{1i} \iff c_3 > c_2$ which is the first property we recalled above. This property can be generalized to any cluster, therefore proving Property 1.1.
 
-Given an item $d_{ij}$ in a cluster $i$ where $j$ is the index of the item inside the cluster, which cluster centroids could $d_{ij}$ conceivably be closest to?
-If $i=1$, then it should make sense that $d_{ij}$ is either closest to $c_1$ or $c_2$. It wouldn’t make sense for it to be closer to $c_3$ (or any centroid higher than that), since $c_3 > c_2$.
-Putting it more formally: We want to minimize the L2 Norm in 1 dimension $|d_{1i} - c_a|$ over the variable $a$.
-By the algebraic definition of absolute values, $|d_{1i}-c3| = c_3-d_{1i}$ because $c_3 > d_{1i}$ and $|d_{1i}-c_2| = c_2-d_{1i}$ because $c_2 \geq d_{1i}$.
-Then it follows that:
-$|d_{1i} - c_3| > |d_{1i} - c_2| \iff c_3 - d_{1i} > c_2 - d_{1i} \iff c_3 > d_2$ which is one of our given properties.
+\textbf{Definition 1.2}: For a cluster border $b_i$ to be in the correct position, all data points to the left of $b_i$ are closer to $c_i$ than $c_{i+1}$, and all data points to the right of $b_i$ are closer to $c_{i+1}$ than $c_i$.
 
-This same argument applies to any cluster $i$: Data points can only be closest to one of the clusters they’re adjacent to or inside of
-i.e. $d_{ij}$ is closest to either $c_{i-1}, c_i$, or $c_{i+1}$
-
-\textbf{Definition \ref{1-2}}
-For a cluster border $b_i$ to be in the correct position, all data points to the left of $b_i$ are closer to $ci$ than $c_{i+1}$, and all data points to the right of $bi$ are closer to $c_{i+1}$ than $ci$.
-
-\textbf{Property \ref{1-3}}
-For convenience, define $m_i = (c_i+c_{i+1})/2$ as the mean of two adjacent cluster centroids.
-
-\textbf{Lemma:}
-if an arbitrary element $d_{ij}$ is less than $m_i$, then it’s closer to $c_i$ than $c_{i+1}$.
-Additionally, if an arbitrary element $d_{ij}$ is greater than $m_i$, then it’s closer to $c_{i+1}$ than $c_i$.
+\textbf{Property 1.3}: For convenience, define $m_i = (c_i+c_{i+1})/2$ as the mean of two adjacent cluster centroids. \textbf{Lemma}: If an arbitrary data point $d_{ij}$ is less than $m_i$, then it is closer to $c_i$ than $c_{i+1}$ and if an arbitrary data point $d_{ij}$ is greater than $m_i$, then it is closer to $c_{i+1}$ than $c_i$.
 
 \begin{itemize}
-    \item If $d_{ij} \leq c_i$ (and hence automatically closer to $c_i$ than $c_{i+1}$):
-    \begin{itemize}
-        \item Then $d_{ij} < m_i$ since $m_i > c_i$
-    \end{itemize}
-    \item If $d_{ij} > c_i:$
-    \begin{itemize}
-        \item Then $|d_{ij} - c_i| = d_{ij} - c_i$ and $|d_{ij}-c_{i+1}| = c_{i+1}-d_{ij}$ (since $d_{ij} < c_{i+1}$ must be true), after which it follows that: $(d_{ij}-c_i) < (c_{i+1}-d_{ij}) \iff 2d_{ij} < c_i+c_{i+1} \iff d_{ij} < (c_i+c_{i+1})/2 \iff d_{ij} < m_i$.
-        \item This also applies to $(d_{ij}-c_i) > (c_{i+1}-d_{ij})$: 
-        \item $(d_{ij}-c_i) > (c_{i+1}-d_{ij}) \iff 2d_{ij} > c_i+c_{i+1} \iff d_{ij} > (c_i+c_{i+1})/2 \iff d_{ij} > m_i$
-    \end{itemize}
+    \item If $d_{ij} \leq c_i$ (and hence automatically closer to $c_i$ than $c_{i+1}$) then $d_{ij} < m_i$ since $m_i > c_i$
+    \item If $d_{ij} > c_i$ then $|d_{ij} - c_i| = d_{ij} - c_i$ and $|d_{ij} - c_{i+1}| = c_{i+1}-d_{ij}$ (since $d_{ij} < c_{i+1}$ must be true), after which it follows that $(d_{ij}-c_i) < (c_{i+1}-d_{ij}) \iff 2d_{ij} < c_i+c_{i+1} \iff d_{ij} < (c_i+c_{i+1})/2 \iff d_{ij} < m_i$. Conversely, this also applies to $(d_{ij}-c_i) > (c_{i+1}-d_{ij})$ where $(d_{ij}-c_i) > (c_{i+1}-d_{ij}) \iff 2d_{ij} > c_i+c_{i+1} \iff d_{ij} > (c_i+c_{i+1})/2 \iff d_{ij} > m_i$.
 \end{itemize}
 
-This extends without loss of generality to an arbitrary element $d_{(i+1)j}$ in cluster $i+1$.
-Then by the lemma, our condition for a cluster border being in the correct position is then that
-the data point $x$ immediately before the border satisfies $x < m_i$, and the data point $y$ immediately after the border satisfies $y > m_i$,
-ensuring that both elements have the shortest distance to the centroid of the cluster it belongs to.
-Then by the transitive property, all elements before $x$ are also closer to $c_i$ than $c_{i+1}$, and all elements after $y$ are also closer to $c_{i+1}$ than $c_i$.
+This extends without loss of generality to an arbitrary data point $d_{(i+1)j}$ in cluster $i+1$. Then by the lemma, the condition for a cluster border being in the correct position is when the data point $x$ immediately before the cluster border satisfies $x < m_i$, and the data point $y$ immediately after the cluster border satisfies $y > m_i$. This ensures that both data points have the shortest distance to the centroid of the cluster they belong to. Then by the transitive property, all data points before $x$ are also closer to $c_i$ than $c_{i+1}$, and all data points after $y$ are closer to $c_{i+1}$ than $c_i$.
 
-\textbf{Property \ref{1-4}}
-We will now prove that once the first $i$ cluster borders have been put in the correct location, it follows that all data points before border $b_i$ have been assigned to the correct cluster
+\textbf{Property 1.4}: We now prove that once the first $i$ cluster borders have been put in the correct position, it follows that all data points before $b_i$ have been assigned to the correct cluster. Our algorithm starts with the first cluster border at position $b_1$, moving it left or right until it is in the correct position as defined by Property 1.3. Since every data point before $b_1$ is closer to $c_1$ than $c_2$, and each data point must be closest to either $c_1$ or $c_2$, we conclude that each data point before $b_1$ has been assigned to the correct cluster $c_1$. We then move on to the second cluster border $b_2$, moving it left or right until it is in the correct position. The same argument as before applies; since every data point between $b_1$ and $b_2$ is closer to $c_2$ than $c_1$ or $c_3$, and since every data point between $b_1$ and $b_2$ must be closest to either $c_1$, $c_2$ or $c_3$, every data point between $b_1$ and $b_2$ must be assigned to the correct cluster. We can continue this process for $i$ cluster borders, resulting in every data point before $b_i$ being assigned to the correct cluster.
 
-Our algorithm starts with the first cluster border at position $b_1$, moving it left/right until it’s in the right place.
-Since every element before $b_1$ is closer to $c_1$ than $c_2$, and each item must be closest to either $c_1$ or $c_2$,
-we can conclude each item before $b_1$ has been assigned to the correct cluster, i.e. the first cluster.
+\textbf{Property 1.5}: We now prove that once the last cluster border $b_{k-1}$ has been moved into the correct position, all data points after $b_{k-1}$ have been assigned to the correct cluster. Following from Property 1.1 and Definition 1.2, all data points after $b_{k-1}$ must be closer to $c_k$ than $c_{k-1}$, and all data points after $b_{k-1}$ must be closest to either $c_k$ or $c_{k-1}$. Therefore, once the last cluster border $b_{k-1}$ has been moved into the correct position, all data points after $b_{k-1}$ have been assigned to the correct cluster.
 
-We then move onto the second cluster border at position $b_2$, and adjust that to the left/right until it’s in the right place.
-The same argument as before applies; since every item before $b_2$ is closer to $c_2$ than $c_1$ or $c_3$,
-and since every item before $b_2$ must be closest to either $c_1$, $c_2$ or $c_3$, everything before $b_2$ must be assigned to the correct cluster.
-We can continue this process for $i$ cluster borders, resulting in every data point before $b_i$ being assigned to the correct cluster.
-
-\textbf{Property \ref{1-5}}
-We will now prove that once the last cluster border $b_{k-1}$ has been moved into the correct position, all data points after $b_{k-1}$ have been assigned to the correct cluster.
-
-% TODO: use links to properties
-Following from property 1.1 and definition 1.2, all data points after $b_{k-1}$ must be closer to ck than ck-1, and all data points after $b_{k-1}$ must be closer to either ck or ck-1. Therefore, once the last cluster border $b_{k-1}$ has been moved into the correct position, all data points after $b_{k-1}$ have been assigned to the correct cluster.
-
-\textbf{Conclusion:}
-% TODO: use links to properties
-Therefore, by properties 1.4 and 1.5, once the algorithm terminates, all data points have been assigned to the correct cluster.
+\textbf{Conclusion}: Therefore, by Property 1.4 and Property 1.5, once the algorithm terminates, all data points have been assigned to the correct cluster.
 
 
-% \noindent\fbox{
-%     \parbox{225pt}{
-%         \textbf{Proof outline for Property \ref{border-cross}}
-%         \begin{proofprp}\end{proofprp}
+\subsubsection{Outline of Proof of Property \ref{border-cross}}
 
-%         % \textbf{Property 2.1:}
-%         \begin{subprp}\label{2-1}
-%             As a cluster border is being adjusted, it cannot cross an unadjusted border to the left or right.
-%         \end{subprp}
-        
-%         % \textbf{Property 2.2:}
-%         \begin{subprp}\label{2-2}
-%             As a cluster border is being adjusted, it cannot cross an already-adjusted border to the left or right.
-%         \end{subprp}
+\textbf{Property 2.1}: As a cluster border is being adjusted, it cannot cross an unadjusted border to its left or right.
 
-%         \textbf{Conclusion:}
-%         By properties 2.1 and 2.2, cluster borders cannot cross each other, even if the f-cluster algorithm is executed in parallel.
-%     }
-% }
-% \vspace{15px}
+\textbf{Property 2.2}: As a cluster border is being adjusted, it cannot cross an already-adjusted border to its left or right.
 
+\textbf{Conclusion}: By Property 2.1 and Property 2.2, cluster borders cannot cross each other, even if the f-cluster algorithm is executed in parallel.
 
-\textbf{Proof of Property \ref{border-cross}}
-\textbf{Property 2.1:}
-Let us start with an un-adjusted cluster border $bi$ surrounded by unadjusted cluster borders $b_{i-1}$ and $b_{i+1}$.
-If $bi$ is moved to the left to get to its correct position, it cannot cross to the left of $d_{i1}$ (the data point just to the right of $b_{i-1}$), since $d_{i1} \leq c_i < c_{i+1}$.
-This means that $d_{i1}$ is closer to $c_i$ than $c_{i+1}$, but if $b_i$ were to cross to the left of $d_{i1}$, that would imply it was closer to $c_{i+1}$.
-This also means that $b_i$ can move at most $n_{i-1}$ data points to the left.
+\subsubsection{Proof of Property \ref{border-cross}}
 
-If $b_i$ is instead moved to the right to get to its correct position, it cannot cross to the right of $d_{i+1n_{i+1}}$ (the data point just to the left of $b_{i+1}$).
-This is because $d_{i+1n_{i+1}} >= c_{i+1} > c_i$, meaning that $d_{i+1n_{i+1}}$ is closer to $c_i+1$ than $c_i$,
-however if $b_i$ crossed to the right of $d_{i+1n_{i+1}}$ that would imply it was closer to $c_i$ than $c_{i+1}$.
-This also means that $b_i$ can move at most $n_{i+1}-1$ data points to the right.
+\textbf{Property 2.1}: Let $b_i$ be an unadjusted cluster border with neighbouring unadjusted cluster borders $b_{i-1}$ and $b_{i+1}$. If $b_i$ is moved to the left to get to its correct position, it cannot cross to the left of $d_{i1}$ (the data point just to the right of $b_{i-1}$), since $d_{i1} \leq c_i < c_{i+1}$. This means that $d_{i1}$ is closer to $c_i$ than $c_{i+1}$. However, if $b_i$ crossed to the left of $d_{i1}$, it is implied that $d_{i1}$ is closer to $c_{i+1}$ than $c_i$. This also means that $b_i$ can move at most $n_{i}-1$ data points to the left.
 
-Combining the fact that $b_i$ can move at most $n_{i-1}$ spots to the left, or move at most $n_{i+1}-1$ spots to the right, the absolute maximum a cluster border can move in one iteration is $\max(n_{i-1}, n_{i+1}-1)$.
+If $b_i$ is instead moved to the right to get to its correct position, it cannot cross to the right of $d_{(i+1)(n_{i+1})}$ (the data point just to the left of $b_{i+1}$). This is because $d_{(i+1)(n_{i+1})} \geq c_{i+1} > c_i$, meaning that $d_{(i+1)(n_{i+1})}$ is closer to $c_{i+1}$ than $c_i$. However, if $b_i$ crossed to the right of $d_{(i+1)(n_{i+1})}$ it is implied that $d_{(i+1)(n_{i+1})}$ is closer to $c_i$ than $c_{i+1}$. This also means that $b_i$ can move at most $n_{i+1}-1$ data points to the right. Combining the fact that $b_i$ can move at most $n_{i}-1$ data points the left, or move at most $n_{i+1}-1$ data points to the right, the absolute maximum a cluster border can move in one iteration is $\max(n_{i}-1, n_{i+1}-1)$.
 
-\textbf{Property 2.2:}
-Let us start with an unadjusted cluster border $b_i$ surrounded by adjusted cluster borders $b_{i-1}$ and $b_{i+1}$.
-If $b_i$ is moved to the left to get to its correct position, it cannot cross to the left of $b_{i-1}$,
-as that would imply that an element left of $b_{i-1}$ was closer to $c_{i+1}$ than $c_{i-1}$, when we already know that the element is closest to $c_{i-1}$.
+\textbf{Property 2.2}: Let $b_i$ be an unadjusted cluster border with neighbouring adjusted cluster borders $b_{i-1}$ and $b_{i+1}$. If $b_i$ is moved to the left to get to its correct position, it cannot cross to the left of $b_{i-1}$, as that would imply that a data point left of $b_{i-1}$ was closer to $c_{i+1}$ than $c_{i-1}$. We know this is not the case because the data point is closest to $c_{i-1}$. If $b_i$ is instead moved to the right to get to its correct position, it cannot cross to the right of $b_{i+1}$, as that would imply that a data point to the right of $b_{i+1}$ was closer to $c_{i-1}$ than $c_{i+1}$. We know this is not the case because the data point is closest to $c_{i+1}$.
 
-If $b_i$ is instead moved to the right to get to its correct position, it cannot cross to the right of $b_{i+1}$,
-as that would imply that an element to the right of $b_{i+1}$ was closer to $c_{i-1}$ than $c_{i+1}$, when we already know that the element is closest to $c_{i+1}$.
+\textbf{Conclusion}: By Property 2.1 and Property 2.2, cluster borders cannot cross each other. This proves that if one were to parallelize f-cluster by dividing the work into $k-1$ chunks, where each process works on one chunk adjusting a single cluster border, the cluster borders cannot cross each other.
 
-\textbf{Conclusion:}
-By properties 2.1 and 2.2, cluster borders cannot cross each other, even if the f-cluster algorithm is executed in parallel, and the maximum number of spots a cluster border $b_i$ can be moved is $\max(n_{i-1}, n_{i+1}-1)$
 
 \subsection{Empirical Runtime Analysis}
-Since each iteration of the f-cluster algorithm produces identical results to the normal k-means algorithm,
-it logically follows that it will take the exact same number of iterations to converge to its final result.
-The number of iterations is known to scale with the size of the dataset,
- but is still an area of active research and is highly variable depending on the initial conditions
-%  TODO:
- (Note: reference a paper that shows a bound on the number of iterations here),
- and so our analysis of the total runtime will simply include iterations as a variable $i$. 
- \par
 
-We also won’t be giving any mathematical proofs of the run times quoted here as the proof would likely be non-trivial enough to be out of the scope of this project.
-\par
+In this section, we compare the runtime of our f-clustering algorithm (Algorithm 4) with the original k-means clustering algorithm (Algorithm 1). Since Algorithm 4 produces identical clustering results as Algorithm 1, it logically follows that Algorithm 4 will take the exact same number of iterations to converge to its final result. The number of iterations in the k-means algorithm is known to scale with the size of the dataset \cite{b7} but is still an area of active research and is highly variable depending on the initial conditions. Therefore, our analysis will not be based on the number of iterations our algorithm performs. We will also not be formally proving any of the time complexities related to the runtime of our algorithm as the proofs would likely be non-trivial and out of the scope of this paper.
 
-For each iteration and each cluster border, we must check if the cluster border needs to be moved, and then move it into the correct position if necessary.
-If we say that the total amount the cluster borders moved plus $k-1$ (to account for checking if each cluster border needs to be moved) is $x$,
-then the total number of operations done for a single iteration is simply $O(x)$.
+We begin by determining the number of operations done per iteration in Algorithm 3. For each cluster border, we check if it needs to be moved and then move it into the correct position if necessary. Let $x$ be the total number of positions the cluster borders move plus $k-1$ (to account for checking if each cluster border needs to be moved), then the total number of operations done for a single iteration is $O(x)$.
 
-For convenience, define $N_\text{sum} = n_1 + \dots + n_k$, so that $N_\text{sum}$ is the number of data points in the dataset
+Next, we observe that $x < n$ where $n$ is the size of the dataset. First, note that the maximum number of positions a cluster border $b_i$ can move is $\max(n_{i}-1, n_{i+1}-1)$ as was shown in the proof of Property \ref{border-cross}. Assume the worst-case scenario: that every cluster border except the last border moves as far to the left as possible, and the last cluster border moves either left or right. Then $b_1$ will move $n_1-1$ positions to the left, $b_2$ will move $n_2-1$ positions to the left, etc... and the last border will move $\max(n_{k-1}-1, n_k-1)$ positions, either to the left or right depending on which centroid is larger. So we have $x = (n_1-1)+(n_2-1) + \dots + (n_{k-2}-1) + \max(n_{k-1}-1, n_k-1) + (k-1) = n_1 + n_2 + \dots + n_{k-2} + \max(n_{k-1}-1, n_k-1) + 1 \leq n_1 + n_2 + \dots + n_{k-2} + \max(n_{k-1}, n_k) < n_1 + n_2 + \dots + n_{k-1} + n_k$, thus proving the property that $x < n$. As we noted in the proof of correctness, there are at most three possibilities for which centroid a given data point is closest to. This implies a different optimized k-means algorithm in which you only check the nearest two or three centroids instead of checking all $k$ centroids as the k-means algorithm does. The fact that $x < n$, proves that our algorithm is faster than this optimized version of the k-means algorithm.
 
-Our first observation is that $x < N_\text{sum}$:
-First, note that the maximum number of spots a cluster border $b_i$ can move is $\max(n_{i-1}, n_{i+1}-1)$ as was shown in part 2 of the proof of correctness.
-Assume the worst case scenario — that every border except the last moves as far to the left as it can go,
-and the last border goes to either the left or right. $b_1$ will move $n_1-1$ spots to the left, $b_2$ will move $n_2-1$ spots to the left, etc... and the last border will move $\max(n_{k-1}-1, n_k-1)$ spots, either to the left or right depending on which is larger.
-So we have 
+\begin{figure}[htbp]
+    \centerline{\includegraphics[width=0.5\textwidth]{figures/fig1.png}}
+    \caption{Number of operations.}
+    \label{fig1}
+\end{figure}
 
-\begin{equation}\begin{aligned}
-    x = (n_1-1)+(n_2-1) + \dots + (n_{k-2}-1) + 
-    \\ \max(n_{k-1}-1, n_{k-1})+(k-1) \\ 
-    = n_1 + n_2 + \dots + n_{k-2} + \max(n_{k-1}-1, n_k-1) + 1 < n_1 + n_2 + \dots + n_{k-2} + \max(n_{k-1}, n_k) < n_1 + n_2 + \dots + n_{k-1} + n_k
-\end{aligned}
-\end{equation}
+\begin{figure}[htbp]
+    \centerline{\includegraphics[width=0.5\textwidth]{figures/fig2.png}}
+    \caption{Ratio of operations over dataset size.}
+    \label{fig2}
+\end{figure}
 
-thus proving the property that $x < N_\text{sum}$.
+For the second phase of Algorithm 4 (clustering phase), the total number of operations performed is proportional to the sum of $x$ values over all iterations where $x$ is the number of positions cluster borders have moved plus $k-1$, which we denote $x_\text{sum}$. This makes the total number of operations during phase two $O(x_\text{sum})$. Figure \ref{fig1} is a plot of how $x_\text{sum}$ scales with the size of the dataset for a variety of different dataset distributions. For Figure \ref{fig1} and Figure \ref{fig2} we used three synthetic datasets: A uniform distribution, a normal distribution, and a distribution with four normal distributions overlapped, with means of 200, 800, 1200, and 1500, each with a standard deviation of 150. The data points were evenly split amongst the four normal distributions.
 
-As we noted in the proof of correctness, there are at most 3 possibilities for which centroid a given data point is closest to.
-This implies a different optimized k-means algorithm in which you only check the nearest 2 or 3 centroids, instead of checking all k centroids as naive k-means does.
-The fact that $x < N_\text{sum}$ proves that our algorithm is faster than even this optimized version of k-means.
+We can make two observations from Figure \ref{fig1}. First, $x_\text{sum}$ scales roughly linearly with the size of the dataset. Second, the slope of the ratio between $x$ and the size of the dataset changes depending on the distribution of the dataset. This slope is a big-oh constant scaling factor that could potentially be ignored, however in Figure \ref{fig2}, we show the ratio of the number of operations over the dataset size ($x_\text{sum}/n$) which appears to approximate a logarithm on the size of the dataset.
 
-For the whole algorithm including all iterations, the total number of operations done is simply the sum of x values over all iterations,
-which we denote $x_\text{sum}$, making the total number of operations for the clustering portion of k-means $O(x_\text{sum})$.
-Below is a plot of how $x_\text{sum}$ scales with the size of the dataset, for a few different distributions of datasets.
+We can conclude that phase 2 of Algorithm 4, including all iterations, takes either $O(n)$ if $x_\text{sum}/n$ converges towards a constant value or $O(n \log n)$ if $x_\text{sum}/n$ follows $\log n$ time. However, since phase 1 of Algorithm 4 sorts the input dataset using a comparison-based sort, the time complexity of Algorithm 4 is $O(n \log n)$ regardless of whether phase 2 is $O(n)$ or $O(n \log n)$. This is in stark contrast to other optimized k-means algorithms which have a time complexity of $O(n^2)$ \cite{b1}.
 
+Additionally, as with Algorithm 1, Algorithm 3 is parallelizable. As noted in the proof of correctness, the cluster dividers cannot cross each other and cause the sum and count calculations to be incorrect, even when the algorithm is executed in parallel. As such, parallelizing the algorithm is possible. If both the sorting and the clustering steps were parallelized, the total runtime for Algorithm 4 would be either $O((\log n)^2 + \frac{n}{k-1}) = O(\frac{n}{k})$ or $O((\log n)^2 + \frac{n}{k-1} \log n) = O(\frac{n}{k} \log n)$, depending on the true complexity of phase 2 \cite{b6}.
 
-% TODO insert figure
-
-As we can clearly see, $x_\text{sum}$ scales linearly with the size of the dataset, although the slope changes based on the distribution.
-This is simply the big $O$ constant scaling factor, and we can safely ignore it.
-We can then conclude that the actual clustering part of K-means, including all iterations,takes a total of $O(n)$ operations.
-Of course, the base requirement to use f-cluster is that the dataset is sorted.
-However since real data generally doesn’t come pre-sorted, we can consider the full runtime of clustering a dataset with a size of n using f-cluster to be O(n log n).
-This is in stark contrast to other optimized K-means algorithms which take $O(n^2)$ time. (Reference paper with $O(n^2)$ optimized k-means here).
-
-As a side note, if one were to zoom in on the start of the graph posted above, one would notice that the slope isn’t entirely constant.
-However this is okay because it quickly converges towards a constant slope as the size of the dataset increases. Below is a graph of $x_\text{sum}/N_\text{sum}$:
-
-In addition, as with normal K-means, our algorithm is parallelizable.
-As we noted in the proof of correctness, the cluster dividers cannot cross each other and interfere with sum/count calculations.
-This holds true even when done in parallel, and as such parallelizing the algorithm is possible.
-If you parallelized both the sorting and the clustering steps (it would be pointless to parallelize just one), 
-the total runtime to sort and cluster the data would be $O(\log n + n/(k-1)) = O(n/k)$ (Note: Reference a paper here that mentions the complexity of parallelized sorting algorithms).
-
-\section{Empirical Runtime Analysis}
+To summarize our results, Algorithm 4 has a time complexity of $O(n \log n)$ when executed sequentially and a time complexity of at most $O(\frac{n}{k} \log n)$ when executed in parallel.
 
 \section{Visualization}
+
 \subsection{Dataset}
 
-So far we have applied our f-clustering algorithm to various artificial datasets but we now apply it to a real-world dataset containing oceanographic hydrological and marine meteorological data [4]. We then visualize the results in two different formats to make the data easier to interpret. Ocean and atmosphere data requires data preprocessing, conversion, and manipulation to properly understand it due to its vast, complex, and high volume nature [4]. We use the ERA5 global climate and weather dataset which contains hourly data on single levels from 1979 to present. ERA5 uses reanalysis and data assimilation techniques which combine the use of model data and observations to create a complete dataset with pre-interpolated data points aligned with a regular latitude/longitude grid in 0.25 degree intervals. For our visualizations, our dataset contains the sea surface temperature, mean sea level pressure (globally), atmospheric temperature two metres above the surface of the earth, and land-sea mask data at hour 00 for every day in the year 2019. This results in 1,440 data points across the longitudinal range of [0,360] and 720 data points across the latitudinal range of [0,180] for a total of 1,036,800 data points per variable per day. This totals 378,432,000 data points for the entire year per variable or 1,513,728,000 when considering all variables. With four variables, the number of data points in the dataset is incredibly large and therefore difficult to process. We perform the data pre-processing in parallel to greatly reduce the execution time required to process the data.
+So far we have applied our f-clustering algorithm to various artificial datasets but we now apply it to a real-world dataset containing oceanographic hydrological and marine meteorological data \cite{b4}. We then visualize the results in two different formats to make the data easier to interpret. Ocean and atmosphere data requires data preprocessing, conversion, and manipulation to properly understand it due to its vast, complex, and high volume nature \cite{b4}. We use the ERA5 global climate and weather dataset which contains hourly data on single levels from 1979 to present. ERA5 uses reanalysis and data assimilation techniques which combine the use of model data and observations to create a complete dataset with pre-interpolated data points aligned with a regular latitude/longitude grid in 0.25º intervals. For our visualizations, our dataset contains the sea surface temperature, mean sea level pressure (globally), atmospheric temperature two metres above the surface of the earth, and land-sea mask data at hour 00 for every day in the year 2019. This results in 1,440 data points across the longitudinal range of [0,360] and 720 data points across the latitudinal range of [0,180] for a total of 1,036,800 data points per variable per day. This totals 378,432,000 data points for the entire year per variable or 1,513,728,000 when considering all variables. With four variables, the number of data points in the dataset is incredibly large and therefore difficult to process. We perform the data pre-processing in parallel to greatly reduce the execution time required to process the data.
 
 \subsection{Data Pre-processing}
 
@@ -487,29 +346,85 @@ We perform three data pre-processing algorithms to the original dataset. First, 
 
 \subsection{Visualizations}
 
+\begin{figure}[htbp]
+    \centerline{\includegraphics[width=0.5\textwidth]{figures/fig3.png}}
+    \caption{Sea Surface Temperature on March 20th 2019.}
+    \label{fig3}
+\end{figure}
+\begin{figure}[htbp]
+    \centerline{\includegraphics[width=0.5\textwidth]{figures/fig4.png}}
+    \caption{Two Metre Atmosphere Temperature on March 20th 2019.}
+    \label{fig4}
+\end{figure}
+\begin{figure}[htbp]
+    \centerline{\includegraphics[width=0.5\textwidth]{figures/fig5.png}}
+    \caption{Sea Surface Temperature on September 22nd 2019.}
+    \label{fig5}
+\end{figure}
+\begin{figure}[htbp]
+    \centerline{\includegraphics[width=0.5\textwidth]{figures/fig6.png}}
+    \caption{Two Metre Atmosphere Temperature on September 22nd 2019.}
+    \label{fig6}
+\end{figure}
+
 We created two different types of visualizations to represent the clustered data. The first visualization plots each cluster on an equirectangular projection of the Earth. Each cluster is coloured based on the value of its centroid. The second visualization is a discrete stepped line graph representing the changes in the values of the variable on the y-axis over a single line of latitude of the earth, from the South Pole to the North Pole. Each cluster appears as a step in the line which is helpful for understanding which latitude clusters of similar values are located on the earth. For each variable, we generated a line graph and a map plot for each day of the year. We then created an animated video for each variable and visualization type. This provides an easy way to visually represent any changing trends in the data throughout the year 2019.
 
-Using the visualizations we created, we can gather useful information from the original dataset. When looking at the map plots of sea surface temperature and two metre atmosphere temperature we can see that the regions close to the equator have a higher temperature than the regions closer to the poles, as expected. Furthermore, we can see the distribution of similar data points by observing the size of each cluster. We see in Fig 2 that a large portion of the earth around the equator has a similar air temperature of around 25 degrees Celsius. This is in contrast to the air temperature in the North Pole region that is sub 20 degrees Celsius that covers much less of the map. We can see from observing Fig 1 that the sea surface temperature similarly has cold regions at both poles while the two metre air temperature in Fig 2 is only that cold at the North Pole.
+Using the visualizations we created, we can gather useful information from the original dataset. When looking at the map plots of sea surface temperature and two metre atmosphere temperature we can see that the regions close to the equator have a higher temperature than the regions closer to the poles, as expected. Furthermore, we can see the distribution of similar data points by observing the size of each cluster. We see in Figure \ref{fig4} that a large portion of the earth around the equator has a similar air temperature of around 25º Celsius. This is in contrast to the air temperature in the North Pole region that is sub 20ª Celsius that covers much less of the map. We can see from observing Figure \ref{fig3} that the sea surface temperature similarly has cold regions at both poles while the two metre air temperature in Figure \ref{fig4} is only that cold at the North Pole.
 
-Another key observation we can make is how the clusters change over time throughout the year. When comparing Fig 2 and Fig 4 we can see that on March 20th, 2019 in Fig 2 the regions near the North Pole are much colder than the same region in Fig 4 on September 22nd, 2019. Similarly, in Fig 2 the temperatures directly above Antarctica are warmer than the same region in Fig 4. When considering the cluster with the hottest temperatures, we see that it’s position on the map in Fig 2 moves from just below the equator to above the equator in Fig 4. A similar effect can also be seen in Fig 1 and Fig 3 where the warmest water is located roughly just below the equator in Fig 1 and slightly above the equator in Fig 3.
+Another key observation we can make is how the clusters change over time throughout the year. When comparing Figure \ref{fig4} and Figure \ref{fig6} we can see that on March 20th, 2019 in Figure \ref{fig4} the regions near the North Pole are much colder than the same region in Figure \ref{fig6} on September 22nd, 2019. Similarly, in Figure \ref{fig4} the temperatures directly above Antarctica are warmer than the same region in Figure \ref{fig6}. When considering the cluster with the hottest temperatures, we see that it’s position on the map in Figure \ref{fig4} moves from just below the equator to above the equator in Figure \ref{fig6}. A similar effect can also be seen in Figure \ref{fig3} and Figure \ref{fig5} where the warmest water is located roughly just below the equator in Figure \ref{fig3} and slightly above the equator in Figure \ref{fig5}.
 
-Using our line graph visualization we can see the clustering results in a completely different format. We observe similar trends as seen in the map plots. When comparing the sea surface temperature in Fig 5 to Fig 7 we see that on September 22nd in Fig 7 the cluster with the coldest temperatures around 75 degrees south is larger than the cluster with the coldest temperatures on March 20th in Fig 5. The opposite is the case for the cluster with the coldest temperatures around 85 degrees north where Fig 6 has more cold data points than the respective cluster in Fig 7. We also observe that the size of the cluster with the warmest temperatures increases significantly in both the sea surface temperature from Fig 5 to Fig 7 and two metre atmosphere temperature from Fig 6 to Fig 8. Lastly, if we consider the overall position of the curve between Fig 5 and Fib 7 and the curve between Fig 6 and Fig 8, it is apparent that the entire curve is shifted farther south of the equator in Fig 5 and Fig 6 and farther north above the equator in Fig 7 and Fig 8. When observing the two metre atmosphere temperature in Fig 6 and Fig 8 we notice significant differences in the temperatures at the south and north poles. In Fig 6 we see that the coldest atmospheric temperature in the South Pole region is around -13 degrees Celsius compared to the -20 degrees Celsius in Fig 8. In Fig 6 we see that the coldest atmospheric temperature in the North Pole is around -30 degrees Celsius compared to the 0 degrees Celsius in Fig 8.
+\begin{figure}[htbp]
+    \centerline{\includegraphics[width=0.5\textwidth]{figures/fig7.png}}
+    \caption{Sea Surface Temperature on March 20th 2019.}
+    \label{fig7}
+\end{figure}
+\begin{figure}[htbp]
+    \centerline{\includegraphics[width=0.5\textwidth]{figures/fig8.png}}
+    \caption{Two Metre Atmosphere Temperature on March 20th 2019.}
+    \label{fig8}
+\end{figure}
+\begin{figure}[htbp]
+    \centerline{\includegraphics[width=0.5\textwidth]{figures/fig9.png}}
+    \caption{Sea Surface Temperature on September 22nd 2019.}
+    \label{fig9}
+\end{figure}
+\begin{figure}[htbp]
+    \centerline{\includegraphics[width=0.5\textwidth]{figures/fig10.png}}
+    \caption{Two Metre Atmosphere Temperature on September 22nd 2019.}
+    \label{fig10}
+\end{figure}
 
-Our observations on the difference in temperature at the polar regions at different times of the year, the sizes of the clusters, and the general shape of the line graphs can ultimately be explained by the movement of the sun. These shifts in atmospheric and sea surface temperature from lower latitudes to higher latitudes and vice versa are caused by the Sun. The Earth receives the highest amount of solar radiation at the point on the Earth's surface where the sun is directly overhead. This point moves north and south throughout the year, moving between the Tropics of Cancer at 23.4 degrees north and the Tropics of Capricorn 23.5 degrees south of the equator respectively [8]. The sun is directly overhead of the Tropics of Cancer during the vernal equinox on March 20th and directly overhead of the Tropics of Capricorn during the autumnal equinox on September 22nd. This explains the shift of sea surface and two metre atmosphere temperature between lower and higher latitudes throughout the year. When the sun is directly overhead the Tropics of Capricorn in the Southern Hemisphere on March 20th we see the largest shift of overall temperatures south of the equator. Similarly, when the sun is directly overhead of the Tropics of Cancer in the Northern Hemisphere on September 22nd we see the largest shift of overall temperatures north of the equator.
+
+Using our line graph visualization we can see the clustering results in a completely different format. We observe similar trends as seen in the map plots. When comparing the sea surface temperature in Figure \ref{fig7} to Figure \ref{fig9} we see that on September 22nd in Figure \ref{fig9} the cluster with the coldest temperatures around 75º S is larger than the cluster with the coldest temperatures on March 20th in Figure \ref{fig7}. The opposite is the case for the cluster with the coldest temperatures around 85º N where Figure \ref{fig8} has more cold data points than the respective cluster in Figure \ref{fig9}. We also observe that the size of the cluster with the warmest temperatures increases significantly in both the sea surface temperature from Figure \ref{fig7} to Figure \ref{fig9} and two metre atmosphere temperature from Figure \ref{fig8} to Figure \ref{fig10}. Lastly, if we consider the overall position of the curve between Figure \ref{fig7} and Fib 7 and the curve between Figure \ref{fig8} and Figure \ref{fig10}, it is apparent that the entire curve is shifted farther south of the equator in Figure \ref{fig7} and Figure \ref{fig8} and farther north above the equator in Figure \ref{fig9} and Figure \ref{fig10}. When observing the two metre atmosphere temperature in Figure \ref{fig8} and Figure \ref{fig10} we notice significant differences in the temperatures at the south and north poles. In Figure \ref{fig8} we see that the coldest atmospheric temperature in the South Pole region is around -13º Celsius compared to the -20º Celsius in Figure \ref{fig10}. In Figure \ref{fig8} we see that the coldest atmospheric temperature in the North Pole is around -30º Celsius compared to the 0º Celsius in Figure \ref{fig10}.
+
+Our observations on the difference in temperature at the polar regions at different times of the year, the sizes of the clusters, and the general shape of the line graphs can ultimately be explained by the movement of the sun. These shifts in atmospheric and sea surface temperature from lower latitudes to higher latitudes and vice versa are caused by the Sun. The Earth receives the highest amount of solar radiation at the point on the Earth's surface where the sun is directly overhead. This point moves north and south throughout the year, moving between the Tropics of Cancer at 23.4º N and the Tropics of Capricorn 23.5º S of the equator respectively \cite{b8}. The sun is directly overhead of the Tropics of Cancer during the vernal equinox on March 20th and directly overhead of the Tropics of Capricorn during the autumnal equinox on September 22nd. This explains the shift of sea surface and two metre atmosphere temperature between lower and higher latitudes throughout the year. When the sun is directly overhead the Tropics of Capricorn in the Southern Hemisphere on March 20th we see the largest shift of overall temperatures south of the equator. Similarly, when the sun is directly overhead of the Tropics of Cancer in the Northern Hemisphere on September 22nd we see the largest shift of overall temperatures north of the equator.
 
 As observed from the changes in cluster locations in both sea surface temperature and two metre atmospheric temperature map plots, we notice that the location and sizes of the clusters shift more dramatically in the two metre atmosphere temperature plots than the sea surface temperature plots. This is due to the ocean being a large body of water that does a better job of absorbing and retaining temperature compared to less dense air. This causes the air temperature to increase and decrease at a faster rate from solar radiation when compared to the ocean water temperature.
 
-We have created two videos that show these changes dynamically. They can be found [cite to link].
+% We have created two videos that show these changes dynamically. They can be found [cite to link].
+
 
 \section{Conclusion}
 
-In this paper, we proposed the f-clustering algorithm, an improved k-means clustering algorithm to cluster data in a single dimension. The proposed algorithm provided significant performance improvements over the well-known k-means algorithm as well as deterministic results. We then proved the correctness of our algorithm by showing it yields the same results as the traditional k-means algorithm. Using artificial datasets with randomly generated data we empirically analyzed the runtime of the algorithm, observing a runtime of O(n log n) in the worst case; an improvement over other improved k-means algorithms with a time complexity of O(n^2) [1]. We then applied the proposed algorithm to a real-world dataset with oceanic and atmospheric data. To better understand the results of our algorithm and the data it produced we visualized the clusters on a map of the Earth as well as a discrete stepped line graph. We were able to observe trends in the size and locations of clusters on the Earth depending on the time of year.
+In this paper, we proposed the f-clustering algorithm, an improved k-means clustering algorithm to cluster data in a single dimension. The proposed algorithm provided significant performance improvements over the well-known k-means algorithm as well as deterministic results. We then proved the correctness of our algorithm by showing it yields the same results as the traditional k-means algorithm. Using artificial datasets with randomly generated data we empirically analyzed the runtime of the algorithm, observing a runtime of $O(n \log n)$ in the worst case; an improvement over other improved k-means algorithms with a time complexity of $O(n^2)$ \cite{b1}. We then applied the proposed algorithm to a real-world dataset with oceanic and atmospheric data. To better understand the results of our algorithm and the data it produced we visualized the clusters on a map of the Earth as well as a discrete stepped line graph. We were able to observe trends in the size and locations of clusters on the Earth depending on the time of year.
 
-A clear limitation of the proposed algorithm is that it can only be applied to data in a single dimension. Many datasets that benefit from clustering have a high-dimensionality. As such, a future improvement would be to extend the concepts used by the proposed algorithm to an algorithm that can be applied to high-dimensional data. 
+A clear limitation of the proposed algorithm is that it can only be applied to data in a single dimension. Many datasets that benefit from clustering have a high-dimensionality. As such, a future improvement would be to extend the concepts used by the proposed algorithm to an algorithm that can be applied to high-dimensional data. A potential approach for this would be to generalize the concept of cluster borders to two or more dimensions using Voronoi diagrams, of which there exist efficient algorithms to compute and manipulate \cite{b10}.
 
 Additionally, improvements can be made to the visualizations presented in this paper. First, the vertical line that appears at the prime meridian (0º longitude) could be removed. This gap in clusters was present even in early visualizations with unmodified data from the dataset. This could be fixed by determining why the data is not available, or interpolate data along the prime meridian to fill in the missing data. Second, the data point averaging algorithm that compresses the dataset could be improved to be more precise when considering masked values in the average calculations. This would result in clusters being plotted closer to land leaving a smaller gap between the edge of clusters and land.
 
 There is a lot of future work related to the topics discussed in this paper that can be done. With the speed of the proposed algorithm combined with our visualization techniques, the visualizations could be expanded to be performed interactively in real-time. This would allow researchers to easily choose between the variable and number of clusters they want to visualize. Another area to expand on is the type of information that is visualized. The relationships between two or more dataset variables could be visualized by creating a function that takes multiple variables and computes a one-dimensional result to be visualized. This could help discover relationships between different components of the global environment such as the relationship between water temperature, air pressure, and air temperature. Another area for future work is parallelization. Because the proposed algorithm has the property that each cluster border will never cross each other it is possible to parallelize its execution by dividing the work into discrete chunks for separate processes to compute without any dependencies.
 
+\begin{thebibliography}{00}
+\bibitem{b1} K. A. Abdul Nazeer and M. P. Sebastian, "Improving the Accuracy and Efficiency of the k-means Clustering Algorithm" in Proceedings of the World Congress on Engineering, WCE 2009, London, U.K., July 1 - 3, 2009
+\bibitem{b2} A. Likas et al., "The global k-means clustering algorithm", Pattern Recognition, vol. 36, no. 2, pp. 451-461, Feb. 2003
+\bibitem{b3} A. M. Fahim et al., "An efficient enhanced k-means clustering algorithm", Journal of Zhejiang University-SCIENCE A, vol. 7, pp. 1626-1633, Oct. 2006
+\bibitem{b4} C. Xie et al., "A survey on visual analysis of ocean data", Visual Informatics, vol. 3, no. 3, pp. 113-128, Sept. 2019
+\bibitem{b5} S. Chattopadhyay, A. K. Das and K. Ghosh, "Finding patterns in the degree distribution of real-world complex networks: going beyond power law", Pattern Analysis and Applications, vol. 23, pp. 913-932, Apr. 2019
+\bibitem{b6} I. Parberry, "The Pairwise Sorting Network", Parallel Processing Letters, vol. 02, no. 02n03, pp. 205-211, Mar. 1992
+\bibitem{b7} D. Arthur et al., "Smoothed Analysis of the k-Means Method", Journal of the ACM, vol. 58, no. 5, pp. 1-31, Oct. 2011
+\bibitem{b8} K. J. Feeley and J. T. Stroud, "Where on Earth are the "tropics"?", Frontiers of Biogeography, vol. 10, no. 1-2, Jul. 2018
+\bibitem{b9} A. Kumar, Y. Sabharwal and S. Sen, "A simple linear time (1 + $\epsilon$)-approximation algorithm for k-means clustering in any dimensions," 45th Annual IEEE Symposium on Foundations of Computer Science, Rome, Italy, 2004, pp. 454-462, doi: 10.1109/FOCS.2004.7.
+\bibitem{b10} S. Fortune, "A sweepline algorithm for Voronoi diagrams", Algorithmica, vol. 2, pp. 153-174, Nov. 1987
+\end{thebibliography}
 
 \end{document}

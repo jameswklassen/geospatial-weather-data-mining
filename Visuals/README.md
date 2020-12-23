@@ -1,8 +1,10 @@
 # Visuals
 
 - [Example of visualization output](examples/map.png)
-- [Example of visualization video](map/k=7/two_metre_temperature/_two_metre_temperature_30.mp4)
+- [Example of visualization video](examples/_two_metre_temperature_30.mp4)
 - [Visualization of performance analysis](performance)
+
+**Note:** as there isn't enough space in our submission to include all visualizations, **please find supplemental materials [here](https://umanitoba-my.sharepoint.com/:f:/g/personal/loewent4_myumanitoba_ca/ErSyuuZR8AtNr6r5UH97I9QB4hOiCpsz2mECRm1mhPNkIw?email=Carson.Leung%40umanitoba.ca&e=u8cmby).**
 
 ## Overview
 

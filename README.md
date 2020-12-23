@@ -1,10 +1,16 @@
 # 4710 Project
 
+**Group 18**
+
 Ryan Froese ([froeser5@myumanitoba.ca](mailto:froeser5@myumanitoba.ca))
 
 James Klassen ([klass167@myumanitoba.ca](mailto:klass167@myumanitoba.ca))
 
 Tyler Loewen ([loewent4@myumanitoba.ca](mailto:loewent4@myumanitoba.ca))
+
+
+
+**Note:** as there isn't enough space in our submission to include all visualizations/data, please find supplemental materials [here](https://umanitoba-my.sharepoint.com/:f:/g/personal/loewent4_myumanitoba_ca/ErSyuuZR8AtNr6r5UH97I9QB4hOiCpsz2mECRm1mhPNkIw?email=Carson.Leung%40umanitoba.ca&e=u8cmby).
 
 ## Directory Overview
 

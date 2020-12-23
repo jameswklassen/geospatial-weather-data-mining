@@ -9,10 +9,10 @@ KELVIN = 273.15             # used to convert between Kelvin and Celsius
 
 DEFAULT_K = 25
 DATA_DIRECTORY = os.getcwd() + '/../Data'
-OUTPUT_DIRECTORY = 'output'
-CONVERTED_DIRECTORY = OUTPUT_DIRECTORY + '/converted'
-CLUSTERED_DIRECTORY = OUTPUT_DIRECTORY + '/clustered'
-FCLUSTERED_DIRECTORY = OUTPUT_DIRECTORY + '/fclustered'
+CONVERTED_DIRECTORY = DATA_DIRECTORY + '/converted'
+CLUSTERED_DIRECTORY = DATA_DIRECTORY + '/clustered'
+FCLUSTERED_DIRECTORY = DATA_DIRECTORY + '/fclustered'
+VISUALS_DIRECTORY = os.getcwd() + '/../Visuals'
 
 VARIABLES = [
     'two_metre_temperature',

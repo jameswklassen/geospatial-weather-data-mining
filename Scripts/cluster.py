@@ -8,7 +8,7 @@ import multiprocessing as mp
 import numpy as np
 from consts import TOTAL_LAT, TOTAL_LON, VARIABLES, CONVERTED_DIRECTORY, CLUSTERED_DIRECTORY, DEFAULT_K
 
-DEBUG = False
+DEBUG = True
 
 
 def choose_random_duplicate(clustermeans, index, backwards):

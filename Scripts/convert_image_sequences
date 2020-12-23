@@ -12,7 +12,7 @@ VARIABLES="
     sea_surface_temperature
     mean_sea_level_pressure"
 
-OUTPUT_DIR="${1:-output/img}"   # directory containing the images
+OUTPUT_DIR="${1:-}"   # directory containing the images
 FRAMERATE="${2:-30}"            # desired output framerate
 EXT="mp4"                       # extension of the file ffmpeg should output
 OVERWRITE=false                 # should ffmpeg blindly overwrite files?

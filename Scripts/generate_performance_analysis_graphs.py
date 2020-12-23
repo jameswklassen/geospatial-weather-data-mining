@@ -3,10 +3,10 @@ import errno
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from consts import DATA_DIRECTORY, OUTPUT_DIRECTORY
+from consts import DATA_DIRECTORY, VISUALS_DIRECTORY
 
 FILENAMES = ['operations.csv', 'operations_ratio.csv']
-IMG_DIRECTORY = f"{OUTPUT_DIRECTORY}/performance"
+IMG_DIRECTORY = f"{VISUALS_DIRECTORY}/performance"
 OUTPUT_FORMATS = ['png']
 
 INPUT_DIRECTORY = f"{DATA_DIRECTORY}/performance"

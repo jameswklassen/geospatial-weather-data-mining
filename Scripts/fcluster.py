@@ -358,7 +358,7 @@ if __name__ == '__main__':
     # If input is a single file, easy case
     if args.input and isfile(args.input):
         print('Cluster', args.input, output_dir)
-        cluster_file(args.input, args.k)
+        cluster_file(args.input, args.k, output_dir)
         exit()
 
     # Since input isn't a single file, it's either

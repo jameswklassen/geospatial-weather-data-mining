@@ -5,7 +5,7 @@ import argparse
 from netCDF4 import Dataset
 import numpy as np
 import multiprocessing as mp
-from consts import TOTAL_LAT, TOTAL_LON, DAYS_IN_YEAR, KELVIN, VARIABLES, DATA_DIRECTORY, OUTPUT_DIRECTORY, CONVERTED_DIRECTORY
+from consts import TOTAL_LAT, TOTAL_LON, DAYS_IN_YEAR, KELVIN, VARIABLES, DATA_DIRECTORY, CONVERTED_DIRECTORY, CONVERTED_DIRECTORY
 
 """
 file: convert_dataset
@@ -14,6 +14,8 @@ purpose:
  - convert data from the raw large NetCDF file to a reduced size JSON file
  - only select the variables we want
 """
+
+OUTPUT_DIRECTORY = CONVERTED_DIRECTORY
 
 DEFAULT_INPUT_FILENAME = DATA_DIRECTORY + '/EAR5-01-01-2020.nc'
 
@@ -90,13 +92,7 @@ def convert_data_for_day(day):
                     if result[var][lat][lon] != '-':
                         data[var][lat][lon] = result[var][lat][lon]
 
-    try:
-        os.makedirs(CONVERTED_DIRECTORY)
-    except OSError as e:
-        if e.errno != errno.EEXIST:
-            raise
-
-    with open(f"{CONVERTED_DIRECTORY}/{day}.json", 'w') as outfile:
+    with open(f"{OUTPUT_DIRECTORY}/{day}.json", 'w') as outfile:
         json.dump(data, outfile)
 
 

@@ -1,3 +1,4 @@
+from Scripts.convert import OUTPUT_DIRECTORY
 from os import listdir, makedirs
 from os.path import isfile, isdir, join, basename
 import errno
@@ -7,15 +8,15 @@ import numpy as np
 import multiprocessing as mp
 import matplotlib.pyplot as plt
 
-from consts import TOTAL_LAT, TOTAL_LON, OUTPUT_DIRECTORY, IGNORED_VARIABLES, DEG, DEFAULT_K
+from consts import TOTAL_LAT, TOTAL_LON, CONVERTED_DIRECTORY, VISUALS_DIRECTORY, DEG, DEFAULT_K
 from utils import get_units, get_english_variable_name, day_str
 
 DEBUG = False
 
 LON = 185
 
-INPUT_DIRECTORY = OUTPUT_DIRECTORY + '/converted'
-IMG_DIRECTORY = OUTPUT_DIRECTORY + '/img'
+INPUT_DIRECTORY = CONVERTED_DIRECTORY
+OUTPUT_DIRECTORY = VISUALS_DIRECTORY + '/line-graph'
 
 OUTPUT_FORMATS = ['png']
 COLOR_LEVELS = 60
@@ -28,7 +29,7 @@ lats = [i-1.375 for i in range(int(TOTAL_LAT/2), int(-TOTAL_LAT/2), -1)]
 def save_file(dir, name):
     """Save the current plot as an .svg in the image directory"""
 
-    dir_path = f"{IMG_DIRECTORY}/{dir}"
+    dir_path = f"{OUTPUT_DIRECTORY}/{dir}"
     try:
         makedirs(dir_path)
     except OSError as e:
@@ -55,7 +56,8 @@ def plot(data, variable, day, output_dir=None, ranges=None, k=None):
 
     ax.set_xlabel('Latitude')
 
-    ax.set_ylim(ranges)
+    if ranges:
+        ax.set_ylim(ranges)
     ax.set_ylabel(f"{get_english_variable_name(variable)} ({get_units(variable)})")
 
     plt.xticks([90, 45, 0, -45, -90], [f'90{DEG} N', f'45{DEG} N', f'0{DEG}', f'45{DEG} S', f'90{DEG} S'])
@@ -84,15 +86,12 @@ def generate_plots(filename, output_dir=None, ranges=None, k=None):
     day = basename(filename).split('.')[0]
 
     for variable in data.keys():
-        if variable in IGNORED_VARIABLES:
-            continue
-
         plot(
             np.array(data[variable], dtype=np.float64),
             variable,
             day,
             output_dir=output_dir,
-            ranges=ranges[variable],
+            ranges=ranges[variable] if ranges else None,
             k=k
         )
 
@@ -115,12 +114,6 @@ def find_lon_with_least_land(data):
 def init():
     try:
         makedirs(OUTPUT_DIRECTORY)
-    except OSError as e:
-        if e.errno != errno.EEXIST:
-            raise
-
-    try:
-        makedirs(IMG_DIRECTORY)
     except OSError as e:
         if e.errno != errno.EEXIST:
             raise
@@ -150,9 +143,12 @@ if __name__ == '__main__':
     # Collect all the .json files in input_dir
     files = [f"{input_dir}/{f}" for f in listdir(input_dir) if isfile(join(input_dir, f)) if f.endswith('json') if not f.startswith('range')]
 
-    with open(f"{input_dir}/range.json", 'r') as my_file:
-        json_data = my_file.read()
-        ranges = json.loads(json_data)
+    try:
+        with open(f"{input_dir}/range.json", 'r') as my_file:
+            json_data = my_file.read()
+            ranges = json.loads(json_data)
+    except FileNotFoundError:
+        ranges = None
 
     pool = mp.Pool(mp.cpu_count())
     pool.starmap(generate_plots, [(file, args.output, ranges, args.k) for file in files])

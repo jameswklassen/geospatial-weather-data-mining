@@ -10,13 +10,13 @@ import matplotlib.ticker as mticker
 from matplotlib import colors, cm
 import cartopy.crs as ccrs
 
-from consts import TOTAL_LAT, TOTAL_LON, OUTPUT_DIRECTORY, IGNORED_VARIABLES, DEFAULT_K
+from consts import TOTAL_LAT, TOTAL_LON, CONVERTED_DIRECTORY, VISUALS_DIRECTORY, DEFAULT_K
 from utils import get_units, get_english_variable_name, day_str
 
 DEBUG = False
 
-INPUT_DIRECTORY = OUTPUT_DIRECTORY + '/converted'
-IMG_DIRECTORY = OUTPUT_DIRECTORY + '/img'
+INPUT_DIRECTORY = CONVERTED_DIRECTORY
+OUTPUT_DIRECTORY = VISUALS_DIRECTORY + '/map'
 
 OUTPUT_FORMATS = ['png']
 COLOR_LEVELS = 60
@@ -29,7 +29,7 @@ lats = [i-1.375 for i in range(int(TOTAL_LAT/2), int(-TOTAL_LAT/2), -1)]
 def save_file(dir, name):
     """Save the current plot as an .svg in the image directory"""
 
-    dir_path = f"{IMG_DIRECTORY}/{dir}"
+    dir_path = f"{OUTPUT_DIRECTORY}/{dir}"
     try:
         makedirs(dir_path)
     except OSError as e:
@@ -56,7 +56,7 @@ def plot(data, variable, day, cmap, output_dir=None, ranges=None, k=None):
     """Plot a single variable on a single day"""
 
     title = get_english_variable_name(variable)
-    min, max = ranges
+    min, max = ranges or (None, None)
 
     ax = plt.axes(projection=ccrs.PlateCarree(), label=f"{title}-{day}")
     ax.set_title(title, fontsize=16)
@@ -114,16 +114,13 @@ def generate_plots(filename, output_dir=None, ranges=None, k=None):
     day = basename(filename).split('.')[0]
 
     for variable in data.keys():
-        if variable in IGNORED_VARIABLES:
-            continue
-
         plot(
             np.array(data[variable], dtype=np.float64),
             variable,
             day,
             color_map(variable),
             output_dir=output_dir,
-            ranges=ranges[variable],
+            ranges=ranges[variable] if ranges else None,
             k=k,
         )
 
@@ -131,12 +128,6 @@ def generate_plots(filename, output_dir=None, ranges=None, k=None):
 def init():
     try:
         makedirs(OUTPUT_DIRECTORY)
-    except OSError as e:
-        if e.errno != errno.EEXIST:
-            raise
-
-    try:
-        makedirs(IMG_DIRECTORY)
     except OSError as e:
         if e.errno != errno.EEXIST:
             raise
@@ -166,9 +157,12 @@ if __name__ == '__main__':
     # Collect all the .json files in input_dir
     files = [f"{input_dir}/{f}" for f in listdir(input_dir) if isfile(join(input_dir, f)) if f.endswith('json') if not f.startswith('range')]
 
-    with open(f"{input_dir}/range.json", 'r') as my_file:
-        json_data = my_file.read()
-        ranges = json.loads(json_data)
+    try:
+        with open(f"{input_dir}/range.json", 'r') as my_file:
+            json_data = my_file.read()
+            ranges = json.loads(json_data)
+    except FileNotFoundError:
+        ranges = None
 
     pool = mp.Pool(mp.cpu_count())
     pool.starmap(generate_plots, [(file, args.output, ranges, args.k) for file in files])

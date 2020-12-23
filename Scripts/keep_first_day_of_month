@@ -1,0 +1,42 @@
+#!/bin/sh
+
+
+CONVERTED_DATA_DIR="../Data/converted"
+CLUSTERED_DATA_DIR="../Data/fclustered"
+VISUALS_DIR="../Visuals"
+
+TYPES="line map"
+K_VALUES="5 6 7 8 9 10"
+VARIABLES="
+    two_metre_temperature
+    sea_surface_temperature
+    mean_sea_level_pressure"
+
+DAYS="0 31 59 90 120 151 181 212 243 273 304 334"
+
+EXT="png"
+
+BASE_DIR=$(pwd)
+
+for type in $TYPES; do
+    for k in $K_VALUES; do
+        echo "k=$k"
+        echo "-----"
+
+        cd "$VISUALS_DIR/$type/k=$k"
+        pwd
+        for variable in $VARIABLES; do
+            cd $variable
+            for i in *.$EXT; do
+                [ -f "$i" ] || break
+                val=$(basename $i ".$EXT")
+                if [[ ! " ${DAYS[@]} " =~ " ${val} " ]]; then
+                    rm $i
+                fi 
+            done
+            cd ..
+        done
+
+        cd $BASE_DIR
+    done
+done

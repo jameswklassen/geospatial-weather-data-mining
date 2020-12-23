@@ -9,7 +9,7 @@
     - runs fcluster on all data
     - generates figures based on clustered data
     - converts image directories to .mp4 files
-- `convert_image_sequencese`
+- `convert_image_sequences`
   - Compiles a sequence of images in into a single video file
 - `loop_videos`
   - Finds all .mp4 files and loops each one over a longer period of time

@@ -1,0 +1,19 @@
+#!/bin/sh
+
+NUM_LOOPS=4
+
+POSTFIX="looped"
+DIRECTORY="${1:-.}"
+EXT="mp4"
+
+# get all files in DIRECTORY with EXT
+files=$(find $DIRECTORY -type f -name "*.$EXT")
+
+for file in $files; do
+    echo "Looping $file"
+
+    output_file="${file%.*}_$POSTFIX.$EXT"
+    ffmpeg -hide_banner -loglevel panic -stream_loop $NUM_LOOPS -i "$file" -c copy "$output_file"
+
+    echo "Created $output_file"
+done

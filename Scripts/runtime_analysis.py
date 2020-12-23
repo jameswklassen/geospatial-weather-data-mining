@@ -1,10 +1,7 @@
-import csv
 import pandas as pd
-import numpy as np
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 
-FILENAME = 'runtime_analysis.csv'
+FILENAMES = ['operations.csv', 'operations_ratio.csv']
 IMG_DIRECTORY = 'output'
 OUTPUT_FORMATS = ['png']
 
@@ -20,57 +17,58 @@ def save_file(name):
         plt.savefig(path, format=output_format, bbox_inches='tight', dpi=500)
 
 
-def plot(data):
+def operations():
     title = 'Number of operations'
+    input_file = 'operations.csv'
+    output_file = 'operations'
+
+    data = pd.read_csv(input_file, sep=',', header=0)
 
     plt.suptitle(title, fontsize=16)
 
     ax = plt.axes(label=title)
-
-    ax.ticklabel_format()
-
-    x = data.get(data.columns[0])
     ax.set_xlabel('Dataset size')
     ax.set_ylabel('Number of operations')
+    ax.ticklabel_format(useMathText=True, useOffset=False)
 
-    relevant_cols = [1, 3, 5, 0]
+    dataset_size = data.get(data.columns[0])
 
-    for col in [data.columns[i] for i in relevant_cols]:
-        ax.plot(x, data.get(col), label=col)
+    for col in data.columns:
+        if col == data.columns[0]:
+            ax.plot(dataset_size, data.get(col), label=col, color='grey', alpha=0.5, linestyle='--')
+        else:
+            ax.plot(dataset_size, data.get(col), label=col)
 
     ax.legend()
 
-    save_file(title)
+    save_file(output_file)
 
-    # More stuff
 
-    title = 'Ratio of operations / datasize'
+def operations_ratio():
+    title = 'Ratio of operations over dataset size'
+    input_file = 'operations_ratio.csv'
+    output_file = 'operations_ratio'
+
+    data = pd.read_csv(input_file, sep=',', header=0)
 
     plt.suptitle(title, fontsize=16)
 
     ax = plt.axes(label=title)
-    ax.ticklabel_format()
-    # ax.ticklabel_format(style='plain')
-
-    x = data.get(data.columns[0])
     ax.set_xlabel('Dataset size')
-    ax.set_ylabel('Number of operations / datasize')
+    ax.set_ylabel('Number of operations / dataset size')
+    ax.ticklabel_format(useMathText=True)
 
-    relevant_cols = [2, 4, 6]
+    dataset_size = data.get(data.columns[0])
 
-    for col in [data.columns[i] for i in relevant_cols]:
-        ax.plot(x, data.get(col), label=col)
+    for col in data.columns:
+        if col != data.columns[0]:
+            ax.plot(dataset_size, data.get(col), label=col)
 
     ax.legend()
-    save_file('Ratio of operationsdatasize')
 
-
-def panda():
-    # my_data = pd.read_csv(FILENAME, sep=',', header=0, usecols=[0, 1, 2, 3])
-    data = pd.read_csv(FILENAME, sep=',', header=0)
-    print(data.get(data.columns[1]))
-    plot(data)
+    save_file(output_file)
 
 
 if __name__ == '__main__':
-    panda()
+    operations()
+    operations_ratio()

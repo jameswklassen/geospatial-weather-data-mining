@@ -8,7 +8,7 @@ Tyler Loewen ([loewent4@myumanitoba.ca](mailto:loewent4@myumanitoba.ca))
 
 ## Directory Overview
 
-### `Visuals`
+### [Visuals](Visuals)
 
 Contains a subset of our visualizations. We created two different visualizations: a map, and a line graph. Each type of visualization has been created with different values of k for our k-mean algorithm. More details can be found in [Visuals/README.md](Visuals/README.md)
 

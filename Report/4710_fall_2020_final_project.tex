@@ -1,5 +1,14 @@
-\documentclass[conference]{IEEEtran}
-\IEEEoverridecommandlockouts
+\documentclass[conference,compsoc]{IEEEtran}
+% \IEEEoverridecommandlockouts
+
+\renewcommand\thesection{\arabic{section}}
+\renewcommand\thesubsection{\thesection.\arabic{subsection}}
+\renewcommand\thesubsubsection{\thesubsection.\arabic{subsubsection}}
+
+\renewcommand\thesectiondis{\arabic{section}}
+\renewcommand\thesubsectiondis{\thesectiondis.\arabic{subsection}}
+\renewcommand\thesubsubsectiondis{\thesubsectiondis.\arabic{subsubsection}}
+
 % The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
 \usepackage{cite}
 \usepackage{amsmath,amssymb,amsthm,amsfonts}
@@ -8,6 +17,8 @@
 \usepackage{textcomp}
 \usepackage{xcolor}
 \usepackage{listings}
+\usepackage[ruled]{algorithm2e}
+\usepackage[explicit]{titlesec}
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
@@ -18,6 +29,8 @@
 \newtheorem{subprp}{Property}[proofprp]
 \newtheorem{thm}[subprp]{Theorem}
 \newtheorem{defn}[subprp]{Definition}
+
+% \overfullrule=1mm
 
 % -----------------------------------------------------------------
 %                   end header
@@ -32,12 +45,14 @@
 Winnipeg, MB, Canada \\
 froeser5@myumanitoba.ca}
 \and
+
 \IEEEauthorblockN{James Klassen}
 \IEEEauthorblockA{\textit{Dept. of Computer Science} \\
 \textit{University of Manitoba} \\
 Winnipeg, MB, Canada \\
 klass167@myumanitoba.ca}
 \and
+
 \IEEEauthorblockN{Tyler Loewen}
 \IEEEauthorblockA{\textit{Dept. of Computer Science} \\
 \textit{University of Manitoba} \\
@@ -54,51 +69,160 @@ or Math in Paper Title or Abstract.
 \end{abstract}
 
 \begin{IEEEkeywords}
-data mining, k-means, clustering, algorithm
+Clustering algorithms, Cluster analysis, k-means algorithm, Data analysis
 \end{IEEEkeywords}
 
 \section{Introduction}
-Clustering is a data mining technique used to arrange large amounts of data into distinct clusters. It is used across many fields such as image processing, pattern recognition, bioinformatics, spatial data analysis, and more. The idea of a clustering algorithm is to create clusters containing data points where every data point in the same cluster is more similar to one another than to the data points in other clusters (i.e., maximizing the intra-class similarities within a cluster and minimizing inter-class similarities between other clusters). Thus, creating a set of data points in a cluster that are locally more similar to each other than to data points in other clusters. In **Section 2** we start by describing the original k-means clustering algorithm in detail along with some of its shortcomings. We then discuss some commonly used approaches to improving the k-means clustering algorithm along with a short description of our proposed improvement. In **Section 3** we fully describe our proposed improved k-means clustering algorithm. We include pseudo code for our algorithm and a formal proof of the time complexity of a single iteration. In **Section 4** we analyze the experimental results of our algorithm and compare between both artificial data sets with different sizes and distributions and a real-world data set. In **Section 5** we use a real-world data set containing oceanic and atmospheric data set combined with our clustering algorithm to visualize geospatial data. Lastly, **Section 6** provides a summary of our findings and potential improvements of our algorithm in the future.
+
+Clustering is a data mining technique used to arrange large amounts of data into distinct clusters. It is used in many fields including image processing, pattern recognition, bioinformatics, spatial data analysis, and more. The idea of a clustering algorithm is to create clusters containing data points from a dataset where every data point in the same cluster is more similar to one another than to the data points in other clusters (i.e., maximizing the intra-class similarities within a cluster and minimizing inter-class similarities between other clusters). Thus, creating a set of data points in a cluster that are locally more similar to each other than to data points in other clusters. Clustering can help researchers better understand the distribution and structure of large datasets. In Section 2 we introduce the partitioning approach to clustering and describe the k-means clustering algorithm along with some of its shortcomings. We then discuss some commonly used approaches to improving the k-means algorithm. In Section 3 we propose our improved k-means algorithm. We include pseudo code for our algorithm, a formal proof of correctness, and the time complexity of a single iteration. In Section 4 we analyze the experimental results of our algorithm and compare both artificial datasets of different sizes and distributions, and a real-world dataset. In Section 5 we use a real-world dataset containing oceanic and atmospheric data combined with our clustering algorithm to visualize geospatial data. We also discuss any new findings and relationships that become apparent when visualizing the data. Lastly, Section 6 provides a summary of our findings, visualizations of our dataset and potential improvements to our algorithm in the future.
 
 \section{Background}
 
-One of the major approaches to clustering is the partitioning method. The partitioning method take a dataset of size *n* and partitions it into some *k* number of partitions (clusters) where *k<=n*, each cluster contains at least one data point, and each data point belongs to exactly one cluster (i.e., distinct clusters). It then evaluates the similarities between items in each cluster using a distance function through an iterative process until all data points are in their final cluster. The centre of a cluster can be calculated using the centroid or medoid methods. The centroid of a cluster is determined by calculating the average of every data point in the cluster while the medoid of a cluster is determined by calculating the median data point of the cluster. \par
+\subsection{Clustering}
 
-One of the most commonly used clustering algorithms is the k-means algorithm [cite]. This algorithm is simple to understand and implement and can be used across a large variety of problems [cite]. During the initial phase of the k-means algorithm, k random values are chosen from the dataset and assigned as the initial means of each k cluster where k is the number of clusters [cite]. In the second phase, the distance from each data point in a cluster to the centroid of every other cluster is calculated. If a data point is closer to a different cluster than the one it currently belongs to, the data point is moved to the closer cluster. After one iteration is complete and all data points have been moved, the centroids for each cluster are recomputed. This process continues until none of the data points move to a different cluster which occurs when the centroids of each partition do not change. One of the problems with the k-means algorithm is the random selection of initial cluster centroids. This random selection has two main effects. First, it makes the algorithm non-deterministic in the results it produces. This means the amount of data points in each cluster can vary greatly depending on initial means chosen [cite]. Second, for large datasets, a bad random selection of initial cluster centroids can greatly reduce the performance of the algorithm due to having to take more iterations to move data points between clusters.
+There are three major techniques for clustering: partitioning methods, hierarchical methods, and density-based methods. The partitioning method is used by the original k-means algorithm and our algorithm. The partitioning method takes a dataset of size $n$ and partitions it into some $k$ number of partitions (clusters) where $k \leq n$. Each cluster contains at least one data point, and each data point belongs to exactly one cluster (i.e., distinct clusters). The similarities between items in each cluster are then evaluated using a distance function through an iterative process until all data points are in their current cluster. The centre of a cluster can be calculated using the centroid or medoid methods. The centroid of a cluster is determined by calculating the average of every data point in the cluster while the medoid of a cluster is determined by calculating the median data point of the cluster.
 
-There have been many attempts to improve the k-means clustering algorithm....
+\subsection{k-Means Clustering Algorithm}
+
+The k-means algorithm is a widely used clustering algorithm that is easy to understand and implement and can be used across a large variety of problems [1, 2, 3, 4, 5]. We have included the pseudo code of the k-means algorithm as Algorithm 1 for reference. There are two phases in the k-mean algorithm. During the initial phase, $k$ random values are chosen from the dataset and assigned as the initial centroids of each of the clusters where $k$ is the number of clusters [1]. In the second phase, the distance from each data point in a cluster to the centroid of every other cluster is calculated. If a data point is closer to a different cluster than the one it currently belongs to, the data point is moved to the closest cluster. After one iteration is complete and all data points have been moved, the centroids for each cluster are recomputed. This process continues until none of the data points move to a different cluster which occurs when the centroids of each cluster do not change. One of the issues with the k-means algorithm is the random selection of initial cluster centroids. This random selection has two main effects on the behaviour of the algorithm. First, it makes the algorithm non-deterministic in the final clusters it produces [1]. This means the number of data points in each cluster can vary greatly depending on the initial centroids chosen. Second, for large datasets, some random selections of initial centroids can greatly reduce the performance of the algorithm as more iterations are required to move data points between clusters [1, 2].
+
+\begin{algorithm}
+    \caption{k-means clustering algorithm}
+    Input:
+        \begin{itemize}
+            \item $D = \{d_1, d_2, \dots, d_n\}$: Set of $n$ data points in any order.
+            \item $k$: Number of clusters.
+        \end{itemize}
+    Output:
+        \begin{itemize}
+            \item A set of $k$ clusters.
+        \end{itemize}
+    Steps:
+        \begin{enumerate}
+            \item Randomly select $k$ data points from $D$ as initial centroids.
+        \end{enumerate}
+        Repeat:
+        \begin{enumerate}
+        \setcounter{enumi}{1}
+            \item Assign each data point $d_i$ to the cluster with the closest centroid.
+            \item Calculate the new centroid of each cluster.
+        \end{enumerate}
+        Stop when values of centroids do not change.
+\end{algorithm}
 
 
+\subsection{Related Work}
 
-\section{Body}
+There have been many improvements to the k-means clustering algorithm [1, 2, 3]. The global k-means clustering algorithm modifies the k-means algorithm by minimizing the distance between data points within the same cluster using the k-means algorithm as a local search procedure [2]. In this algorithm, the local k-means algorithm starts with a single cluster and calculates the centroid of this cluster. The global k-means algorithm then applies the k-means algorithm sequentially on an increasingly large number of clusters to solve a local problem [2]. At the start of each local search, the cluster centroids are initially placed at the currently most optimal position, which is determined by the centroids calculated in the previous iteration’s local search [2]. This improves performance by reducing the number of data points that have to be moved between clusters. The global k-means algorithm produces deterministic results because it starts with a single cluster and computed centroid. It also has improved performance over the k-means algorithm because it always passes the most recently calculated centroid(s) of the current iteration to the next iteration, reducing the number of data points that are moved between clusters [2].
+
+\par
+
+The improved k-means algorithm proposed by K. Nazeer and M. P. Sebastian [1] modifies the original k-means algorithm using a technique to systematically determine the initial centroids of each cluster with better accuracy than when selecting them randomly [1]. The clustering process is then applied to the initial clusters using a heuristic approach for improved efficiency [1]. In this heuristic approach, the distances from each data point in a cluster to their nearest cluster are saved and passed to the next iteration. In the next iteration the distances from the previous iteration are compared to the new distances from each data point in the cluster to the cluster they are closest to. If the distance calculated in the current iteration is less than or equal to the distance calculated in the previous iteration then the data point stays in its current cluster. Otherwise, the distance from the data point to every other cluster is calculated to find the new closest cluster to the data point.
+
+\section{Modified Approach}
+
+\subsection{f-Clustering algorithm}
+
+In this paper, we propose the f-cluster algorithm, a modified version of the original k-means algorithm optimized for single-dimensional data. The f-cluster algorithm has two phases. In the first phase, we use Algorithm 2 to determine the initial cluster centroids which are used in Algorithm 3. To get the initial cluster centroids, Algorithm 2 sorts the data points in ascending order in step 1 and assigns a centroid value to each $k$ clusters by choosing $k$ data points evenly distributed across the dataset in steps 2 and 3. In step 4, we iterate over each data point exactly once and assign it to the cluster closest to it. The initial centroids are recalculated in step 5 to account for data points that have changed clusters in step 4. Lastly, step 6 returns the list of initial centroids, a list of the sum of data point values in each cluster, and the number of data points in each cluster.
+
+\begin{algorithm}
+    \caption{Determine initial centroids}
+    Input:
+        \begin{itemize}
+            \item $D = \{d_1, d_2, \dots, d_n\}$: Set of $n$ data points in any order.
+            \item $k$: Number of clusters.
+        \end{itemize}
+    Output:
+        \begin{itemize}
+            \item $C = \{c_1, c_2, \dots, c_k\}$: Set of initial cluster centroids in ascending order.
+            \item $S = \{s_1, s_2, \dots, s_k\}$: The sum of data point values in each cluster.
+            \item $N = \{n_1, n_2, \dots, n_k\}$: The number of data points in each cluster.
+        \end{itemize}
+    Steps:
+        \begin{enumerate}
+            \item Sort $D$ in ascending order.
+            \item Define the first data point $d_1$ as $\mathsf{min}$ and the last data point $d_n$ as $\mathsf{max}$.
+            \item Define $C$ as a linear interpolation between the $\mathsf{min}$ and the $\mathsf{max}$ with $k$ data points. (i.e. $c_1$ = $\mathsf{min}$ ($d_1$) , $c_k$ = $\mathsf{max}$ ($d_n$), etc)
+            \item For each data point $d_i$:
+            \begin{itemize}
+                \item Determine the cluster centroid closest to $d_i$.
+                \item Add the value of $d_i$ to the appropriate element in $S$.
+                \item Increment the count of the appropriate element in $N$.
+            \end{itemize}
+            \item Re-calculate each centroid $c_i \in C$ as $\frac{s_i}{n_i}$.
+            \item Return $C$, $S$, and $N$.
+        \end{enumerate}
+\end{algorithm}
+
+% 3a
+
+In the second phase, we use Algorithm 3 which takes the output of Algorithm 2 and determines the final clusters. Step 1 calculates the positions of the cluster borders by using the number of data points in each cluster as seen in Eq.(1). Once the cluster borders are calculated we calculate the initial average of the border in Step 2 using the centroids of the two clusters neighbouring the cluster border. Step 3 is an iterative looping process that moves the cluster borders one position at a time until they are in the correct position. Step 3 is executed on each cluster border sequentially, only moving the next cluster border when the current cluster border is in the correct position. There are three cases to consider in Step 3. In case 3a, the cluster border continues to move one position to the left as long as the data point to the left of the cluster border is greater or equal to the cluster border average. In case 3b the cluster border continues to move one position to the right as long as the data point to the right of the cluster border is less than the cluster border average. In both case 3a and case 3b, the cluster border will no longer be moved when case 3c is true. In case 3c the cluster border is in the correct position because the data point directly to the left of the border is less than the cluster border average and the data point immediately to the right of the cluster border is greater or equal to the cluster border average. When this is the case, the algorithm continues to the next cluster border. When case 3c is true for every cluster border, then all data points are in the correct clusters; this is the terminating condition of Algorithm 3. When Step 3 has terminated, any clusters containing no data points are removed in Step 4. Then in Step 5, the centroid of each cluster is updated using the cluster sums and cluster counts lists. Since each cluster sum and count is updating continuously in Step 3, calculating the centroids in Step 5 is trivial and does not require iterating over every data point. Finally, Step 6 outputs the list of centroids, sums of each cluster, and the number of items in each cluster.
+
+\begin{algorithm}
+    \caption{f-cluster algorithm}
+    Input:
+        \begin{itemize}
+            \item $D = \{d_1, d_1, \dots, d_k\}$: Set of n data points in ascending order.
+            \item $k$: Number of clusters.
+            \item $C = \{c_1, c_2, \dots, c_k\}$: Current set of cluster centroids in ascending order.
+            \item $S = \{s_1, s_2, \dots, s_k\}$: The sum of data points values in each cluster.
+            \item $N = \{n_1, n_2, \dots, n_k\}$: The number of data points in each cluster.
+        \end{itemize}
+    Output:
+        \begin{itemize}
+            \item $C = \{c_1, c_2, \dots, c_k\}$: Updated centroids for each cluster.
+            \item $S = \{s_1, s_2, \dots, s_k\}$: Updated sums of data points values in each cluster.
+            \item $N = \{n_1, n_2, \dots, n_k\}$: Updated numbers of data points in each cluster.
+        \end{itemize}
+    Steps:
+        \begin{enumerate}
+            \item Determine the indexes that divide each cluster using $N$.
+            \item Compute the cluster border averages by taking the average of the cluster centroids adjacent to each cluster border.
+            \item Repeat for each cluster border $b_i$:
+            \begin{itemize}
+                \item If the data point immediately before $b_i$ is greater than or equal to the corresponding adjacent cluster border average, move $b_i$ to the left until this is no longer the case. Update the appropriate elements in $S$ and $C$ for each cluster.
+                \item If the data point immediately after $b_i$ is less than the corresponding adjacent cluster border average, move $b_i$ to the right until this is no longer the case. Update the appropriate elements in $S$ and $C$ for each cluster.
+                \item If the data point immediately before $b_i$ is less than the corresponding adjacent cluster border average, and the data point immediately after the cluster border is greater than or equal to the corresponding adjacent cluster border average, $b_i$ is in the correct position.
+            \end{itemize}
+            \item Delete any empty clusters.
+            \item Update each $c_i \in C$ as $\frac{s_i}{n_i}$.
+            \item Return $C$, $S$, $N$.
+        \end{enumerate}
+\end{algorithm}
+
 
 \subsection{Algorithm Overview}
 \noindent\fbox{
     \parbox{225pt}{
-        \textbf{Normal K-mean algorithm:}
-        \begin{itemize}
-            \item Inputs
-                \begin{itemize}
-                    \item Dataset: All data points in any order
-                    \item K: Number of clusters
-                    \item Input means: Current set of cluster means
-                \end{itemize}
-            \item Outputs
-                \begin{itemize}
-                    \item Output means: Updated means for each cluster
-                \end{itemize}
+        \textbf{Algorithm 2}: Determine initial centroids
+        \par
+        Input:
+            \begin{itemize}
+                \item $D = \{d_1, d_2, \dots, d_n\}$: Set of $n$ data points in any order.
+                \item $k$: Number of clusters.
             \end{itemize}
+        Output:
+            \begin{itemize}
+                \item $C = \{c_1, c_2, \dots, c_k\}$: Set of initial cluster centroids in ascending order.
+                \item $S = \{s_1, s_2, \dots, s_k\}$: The sum of data point values in each cluster.
+                \item $N = \{n_1, n_2, \dots, n_k\}$: The number of data points in each cluster.
+            \end{itemize}
+        Steps:
+            \begin{enumerate}
+                \item Sort $D$ in ascending order.
+                \item Define the first data point $d_1$ as $\mathsf{min}$ and the last data point $d_n$ as $\mathsf{max}$.
+                \item Define $C$ as a linear interpolation between the $\mathsf{min}$ and the $\mathsf{max}$ with $k$ data points. (i.e. $c_1$ = $\mathsf{min}$ ($d_1$) , $c_k$ = $\mathsf{max}$ ($d_n$), etc)
+                \item For each data point $d_i$:
+                \begin{itemize}
+                    \item Determine the cluster centroid closest to $d_i$.
+                    \item Add the value of $d_i$ to the appropriate element in $S$.
+                    \item Increment the count of the appropriate element in $N$.
+                \end{itemize}
+                \item Re-calculate each centroid $c_i$ in $C$ as $\frac{s_i}{n_i}$.
+                \item Return $C$, $S$, and $N$.
+            \end{enumerate}
     }
 }
-\vspace{15px}
-
-\textbf{Steps:}
-\begin{enumerate}
-    \item For each data point, determine which cluster it’s closest to by calculating its distance to each cluster’s mean.
-    \item Calculate the mean of each cluster using the data from step 1 as Output means
-    \item Return Output means
-\end{enumerate}
-
 
 \noindent\fbox{
     \parbox{225pt}{
@@ -171,7 +295,7 @@ In this proof we use the concept of cluster borders separating the data set into
 This is an integral concept as the algorithm leans heavily on it.
 In order to better visualize the intuition of the algorithm, we model the data and associated clusters as a sorted list of data points in clusters separated by cluster borders, i.e. the first border separates clusters 1 and 2, etc.. The set of all cluster borders positions is $B = b_1, \dots, b_{k-1}$. Visually, this looks like the following diagram:
 
-\begin{equation}\begin{aligned}
+\begin{equation}\label{alg-vis}\begin{aligned}
 D=
 \underbrace{d_{11}, d_{12}, \dots, d_{1x_1}}_{\substack{s_1 = d_{11} + \dots + d_{1x_1} \\  c_1 = \frac{s_1}{x_1}}}
 \overbrace{|}^{\substack{b_1 = \\ x_1}}
@@ -404,6 +528,14 @@ As we noted in the proof of correctness, the cluster dividers cannot cross each 
 This holds true even when done in parallel, and as such parallelizing the algorithm is possible.
 If you parallelized both the sorting and the clustering steps (it would be pointless to parallelize just one), 
 the total runtime to sort and cluster the data would be $O(\log n + n/(k-1)) = O(n/k)$ (Note: Reference a paper here that mentions the complexity of parallelized sorting algorithms).
+
+\section{F-clustering algorithm}
+
+\section{Results}
+
+\section{Visualization}
+
+\section{Conclusion}
 
 
 \end{document}

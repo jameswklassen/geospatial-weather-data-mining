@@ -1,4 +1,7 @@
-# Visualizations
+# Visuals
+
+- [Example of visualization output](map/k=7/two_metre_temperature)
+- [Example of visualization video](map/k=7/two_metre_temperature/_two_metre_temperature_30.mp4)
 
 ## Overview
 

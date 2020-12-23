@@ -129,5 +129,5 @@ if __name__ == '__main__':
 
     ctd = Dataset(INPUT_FILENAME, 'r')
 
-    for day in range(DAYS_IN_YEAR):
+    for day in range(len(ctd.variables['time'])):
         convert_data_for_day(day)

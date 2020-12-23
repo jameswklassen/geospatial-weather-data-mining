@@ -12,7 +12,7 @@ K_VALUES="5 6 7 8 9 10"
 
 CONVERTED_DATA_DIR="../Data/converted"
 CLUSTERED_DATA_DIR="../Data/fclustered"
-VISUALIZATION_DIR="../Visualization"
+VISUALS_DIR="../Visuals"
 
 
 for k in $K_VALUES; do
@@ -23,12 +23,12 @@ for k in $K_VALUES; do
     python fcluster.py -i "$CONVERTED_DATA_DIR" -k $k -o "k=$k"
 
     # Generate figures (map/line) based on the clustered data
-    python generate_map.py -i "$CLUSTERED_DATA_DIR/k=$k" -o "$VISUALIZATION_DIR/map/k_$k" -k $k
-    python generate_line_graph.py -i "$CLUSTERED_DATA_DIR/k=$k" -o "$VISUALIZATION_DIR/line/k_$k" -k $k
+    python generate_map.py -i "$CLUSTERED_DATA_DIR/k=$k" -o "k=$k" -k $k
+    python generate_line_graph.py -i "$CLUSTERED_DATA_DIR/k=$k" -o "lk=$k" -k $k
 
     # Generate mp4 files from the figures
-    ./convert_image_sequences "$VISUALIZATION_DIR/map/k_$k"
-    ./convert_image_sequences "$VISUALIZATION_DIR/line/k_$k"
+    ./convert_image_sequences "$VISUALS_DIR/map/k=$k"
+    ./convert_image_sequences "$VISUALS_DIR/line/k=$k"
 
     echo
 done

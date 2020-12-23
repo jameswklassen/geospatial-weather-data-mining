@@ -1,4 +1,3 @@
-from Scripts.convert import OUTPUT_DIRECTORY
 from os import listdir, makedirs
 from os.path import isfile, isdir, join, basename
 import errno

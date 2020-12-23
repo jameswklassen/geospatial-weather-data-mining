@@ -36,7 +36,7 @@
 %------------------------------------------------------------------
 
 \begin{document}
-\title{An Improved K-Means Clustering Algorithm for One Dimensional Data}
+\title{The Border K-Means Clustering Algorithm for One Dimensional Data}
 
 \author{\IEEEauthorblockN{Ryan Froese}
 \IEEEauthorblockA{\textit{Dept. of Computer Science} \\
@@ -62,7 +62,7 @@ loewent4@myumanitoba.ca}
 \maketitle
 
 \begin{abstract}
-Clustering is a widely used technique for data pre-processing, mining, and analysis. The k-means clustering algorithm is commonly used because of its simplicity and flexibility to work in many data mining domains. Despite being commonly used, the k-means algorithm suffers from non-deterministic results and run times that vary greatly depending on the initial selection of cluster centroids. There have been many proposed improvements to the k-means algorithm. We propose the f-cluster algorithm which combines concepts from the k-means algorithm with an additional focus on the concepts of the borders dividing clusters. What we find is deterministic results with greatly improved run time over the k-means algorithm.
+Clustering is a widely used technique for data pre-processing, mining, and analysis. The k-means clustering algorithm is commonly used because of its simplicity and flexibility to work in many data mining domains. Despite being commonly used, the k-means algorithm suffers from non-deterministic results and run times that vary greatly depending on the initial selection of cluster centroids. There have been many proposed improvements to the k-means algorithm. We propose the border k-means clustering algorithm which combines concepts from the k-means algorithm with an additional focus on the concepts of the borders dividing clusters. What we find is deterministic results with greatly improved run time over the k-means algorithm.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -114,9 +114,9 @@ The improved k-means algorithm proposed by K. Nazeer and M. P. Sebastian \cite{b
 
 \section{Modified Approach}
 
-\subsection{f-Clustering algorithm}
+\subsection{The border k-means clustering algorithm}
 
-In this paper, we propose the f-cluster algorithm, a modified version of the original k-means algorithm optimized for single-dimensional data. The f-cluster algorithm has two phases. In the first phase, we use Algorithm 2 to determine the initial cluster centroids which are used in Algorithm 3. To get the initial cluster centroids, Algorithm 2 sorts the data points in ascending order in Step 1 and assigns a centroid value to each $k$ clusters by choosing $k$ data points evenly distributed across the dataset in Step 2. In Step 3, we iterate over each data point exactly once and assign it to the cluster it is closest to. The initial centroids are recalculated in Step 4 to account for data points that have changed clusters in Step 3. Lastly, Step 5 returns the list of initial centroids, a list of the sum of data point values in each cluster, and the number of data points in each cluster.
+In this paper, we propose the border k-means clustering algorithm, a modified version of the original k-means algorithm optimized for single-dimensional data. The border k-means algorithm has two phases. In the first phase, we use Algorithm 2 to determine the initial cluster centroids which are used in Algorithm 3. To get the initial cluster centroids, Algorithm 2 sorts the data points in ascending order in Step 1 and assigns a centroid value to each $k$ clusters by choosing $k$ data points evenly distributed across the dataset in Step 2. In Step 3, we iterate over each data point exactly once and assign it to the cluster it is closest to. The initial centroids are recalculated in Step 4 to account for data points that have changed clusters in Step 3. Lastly, Step 5 returns the list of initial centroids, a list of the sum of data point values in each cluster, and the number of data points in each cluster.
 
 \begin{algorithm}\label{alg-2}
     \caption{Finding initial centroids}
@@ -150,7 +150,7 @@ In the second phase, we use Algorithm 3 which takes the output of Algorithm 2 an
 
 
 \begin{algorithm}\label{alg-3}
-    \caption{f-cluster algorithm}
+    \caption{The border k-means clustering algorithm}
     Input:
         \begin{itemize}
             \item $D = \{d_1, d_1, \dots, d_n\}$: Set of $n$ data points in ascending order
@@ -209,7 +209,7 @@ Algorithm 4 is the complete algorithm that combines Algorithm 2 and Algorithm 3.
 
 \subsection{Proof of Correctness}
 
-In this section we prove the following two properties of the f-cluster algorithm to show that the algorithm always produces the correct results:
+In this section we prove the following two properties of the border k-means algorithm to show that the algorithm always produces the correct results:
 \begin{prp}\label{closest-centroid}Each data point in the dataset will be assigned to the cluster it is closest to\end{prp}
 \begin{prp}\label{border-cross}The cluster borders cannot cross each other as this would cause the sum and count calculations to be incorrect.\end{prp}
 
@@ -291,7 +291,7 @@ This extends without loss of generality to an arbitrary data point $d_{(i+1)j}$ 
 
 \textbf{Property 2.2}: As a cluster border is being adjusted, it cannot cross an already-adjusted border to its left or right.
 
-\textbf{Conclusion}: By Property 2.1 and Property 2.2, cluster borders cannot cross each other, even if the f-cluster algorithm is executed in parallel.
+\textbf{Conclusion}: By Property 2.1 and Property 2.2, cluster borders cannot cross each other, even if the border k-means algorithm is executed in parallel.
 
 \subsubsection{Proof of Property \ref{border-cross}}
 
@@ -301,12 +301,12 @@ If $b_i$ is instead moved to the right to get to its correct position, it cannot
 
 \textbf{Property 2.2}: Let $b_i$ be an unadjusted cluster border with neighbouring adjusted cluster borders $b_{i-1}$ and $b_{i+1}$. If $b_i$ is moved to the left to get to its correct position, it cannot cross to the left of $b_{i-1}$, as that would imply that a data point left of $b_{i-1}$ was closer to $c_{i+1}$ than $c_{i-1}$. We know this is not the case because the data point is closest to $c_{i-1}$. If $b_i$ is instead moved to the right to get to its correct position, it cannot cross to the right of $b_{i+1}$, as that would imply that a data point to the right of $b_{i+1}$ was closer to $c_{i-1}$ than $c_{i+1}$. We know this is not the case because the data point is closest to $c_{i+1}$.
 
-\textbf{Conclusion}: By Property 2.1 and Property 2.2, cluster borders cannot cross each other. This proves that if one were to parallelize f-cluster by dividing the work into $k-1$ chunks, where each process works on one chunk adjusting a single cluster border, the cluster borders cannot cross each other.
+\textbf{Conclusion}: By Property 2.1 and Property 2.2, cluster borders cannot cross each other. This proves that if one were to parallelize the border k-means algorithm by dividing the work into $k-1$ chunks, where each process works on one chunk adjusting a single cluster border, the cluster borders cannot cross each other.
 
 
 \subsection{Empirical Runtime Analysis}
 
-In this section, we compare the runtime of our f-clustering algorithm (Algorithm 4) with the original k-means clustering algorithm (Algorithm 1). Since Algorithm 4 produces identical clustering results as Algorithm 1, it logically follows that Algorithm 4 will take the exact same number of iterations to converge to its final result. The number of iterations in the k-means algorithm is known to scale with the size of the dataset \cite{b7} but is still an area of active research and is highly variable depending on the initial conditions. Therefore, our analysis will not be based on the number of iterations our algorithm performs. We will also not be formally proving any of the time complexities related to the runtime of our algorithm as the proofs would likely be non-trivial and out of the scope of this paper.
+In this section, we compare the runtime of our border k-means algorithm (Algorithm 4) with the original k-means clustering algorithm (Algorithm 1). Since Algorithm 4 produces identical clustering results as Algorithm 1, it logically follows that Algorithm 4 will take the exact same number of iterations to converge to its final result. The number of iterations in the k-means algorithm is known to scale with the size of the dataset \cite{b7} but is still an area of active research and is highly variable depending on the initial conditions. Therefore, our analysis will not be based on the number of iterations our algorithm performs. We will also not be formally proving any of the time complexities related to the runtime of our algorithm as the proofs would likely be non-trivial and out of the scope of this paper.
 
 We begin by determining the number of operations done per iteration in Algorithm 3. For each cluster border, we check if it needs to be moved and then move it into the correct position if necessary. Let $x$ be the total number of positions the cluster borders move plus $k-1$ (to account for checking if each cluster border needs to be moved), then the total number of operations done for a single iteration is $O(x)$.
 
@@ -338,11 +338,11 @@ To summarize our results, Algorithm 4 has a time complexity of $O(n \log n)$ whe
 
 \subsection{Dataset}
 
-So far we have applied our f-clustering algorithm to various artificial datasets but we now apply it to a real-world dataset containing oceanographic hydrological and marine meteorological data \cite{b4}. We then visualize the results in two different formats to make the data easier to interpret. Ocean and atmosphere data requires data preprocessing, conversion, and manipulation to properly understand it due to its vast, complex, and high volume nature \cite{b4}. We use the ERA5 global climate and weather dataset which contains hourly data on single levels from 1979 to present. ERA5 uses reanalysis and data assimilation techniques which combine the use of model data and observations to create a complete dataset with pre-interpolated data points aligned with a regular latitude/longitude grid in 0.25º intervals. For our visualizations, our dataset contains the sea surface temperature, mean sea level pressure (globally), atmospheric temperature two metres above the surface of the earth, and land-sea mask data at hour 00 for every day in the year 2019. This results in 1,440 data points across the longitudinal range of [0,360] and 720 data points across the latitudinal range of [0,180] for a total of 1,036,800 data points per variable per day. This totals 378,432,000 data points for the entire year per variable or 1,513,728,000 when considering all variables. With four variables, the number of data points in the dataset is incredibly large and therefore difficult to process. We perform the data pre-processing in parallel to greatly reduce the execution time required to process the data.
+So far we have applied our border k-means algorithm to various artificial datasets but we now apply it to a real-world dataset containing oceanographic hydrological and marine meteorological data \cite{b4}. We then visualize the results in two different formats to make the data easier to interpret. Ocean and atmosphere data requires data preprocessing, conversion, and manipulation to properly understand it due to its vast, complex, and high volume nature \cite{b4}. We use the ERA5 global climate and weather dataset which contains hourly data on single levels from 1979 to present. ERA5 uses reanalysis and data assimilation techniques which combine the use of model data and observations to create a complete dataset with pre-interpolated data points aligned with a regular latitude/longitude grid in 0.25º intervals. For our visualizations, our dataset contains the sea surface temperature, mean sea level pressure (globally), atmospheric temperature two metres above the surface of the earth, and land-sea mask data at hour 00 for every day in the year 2019. This results in 1,440 data points across the longitudinal range of [0,360] and 720 data points across the latitudinal range of [0,180] for a total of 1,036,800 data points per variable per day. This totals 378,432,000 data points for the entire year per variable or 1,513,728,000 when considering all variables. With four variables, the number of data points in the dataset is incredibly large and therefore difficult to process. We perform the data pre-processing in parallel to greatly reduce the execution time required to process the data.
 
 \subsection{Data Pre-processing}
 
-We perform three data pre-processing algorithms to the original dataset. First, to increase the speed of our f-clustering algorithm without significant loss of data precision, we take the original dataset and significantly reduce its size. This is done by iterating through every data point located at an integer latitude/longitude coordinate and calculating an averaged data point using the grid of data points located four data points above and to the right of the averaged data point. Running this averaging algorithm on each of the variables from the original dataset excluding the sea-land mask variable reduces a variable's size from 1,036,800 to 64,800 data points per day without losing significant amounts of precision. This leads to a total reduction of 1,135,296,000 to 70,956,000 data points. Second, because our two metre atmosphere temperature and mean sea level pressure variables contain data covering the entire globe (including land) we use the land-sea mask variable to remove any data points that were measured above land. This helps keep the focus of our visualization on oceanic data. Last, we remove any averaged data points that contain one or more masked values in their averaging calculation. We parallelize these data pre-processing algorithms which greatly reduces the execution time of the data pre-processing stage.
+We perform three data pre-processing algorithms to the original dataset. First, to increase the speed of our border k-means algorithm without significant loss of data precision, we take the original dataset and significantly reduce its size. This is done by iterating through every data point located at an integer latitude/longitude coordinate and calculating an averaged data point using the grid of data points located four data points above and to the right of the averaged data point. Running this averaging algorithm on each of the variables from the original dataset excluding the sea-land mask variable reduces a variable's size from 1,036,800 to 64,800 data points per day without losing significant amounts of precision. This leads to a total reduction of 1,135,296,000 to 70,956,000 data points. Second, because our two metre atmosphere temperature and mean sea level pressure variables contain data covering the entire globe (including land) we use the land-sea mask variable to remove any data points that were measured above land. This helps keep the focus of our visualization on oceanic data. Last, we remove any averaged data points that contain one or more masked values in their averaging calculation. We parallelize these data pre-processing algorithms which greatly reduces the execution time of the data pre-processing stage.
 
 \subsection{Visualizations}
 
@@ -406,7 +406,7 @@ As observed from the changes in cluster locations in both sea surface temperatur
 
 \section{Conclusion}
 
-In this paper, we proposed the f-clustering algorithm, an improved k-means clustering algorithm to cluster data in a single dimension. The proposed algorithm provided significant performance improvements over the well-known k-means algorithm as well as deterministic results. We then proved the correctness of our algorithm by showing it yields the same results as the traditional k-means algorithm. Using artificial datasets with randomly generated data we empirically analyzed the runtime of the algorithm, observing a runtime of $O(n \log n)$ in the worst case; an improvement over other improved k-means algorithms with a time complexity of $O(n^2)$ \cite{b1}. We then applied the proposed algorithm to a real-world dataset with oceanic and atmospheric data. To better understand the results of our algorithm and the data it produced we visualized the clusters on a map of the Earth as well as a discrete stepped line graph. We were able to observe trends in the size and locations of clusters on the Earth depending on the time of year.
+In this paper, we proposed the border k-means clustering algorithm, an improved k-means clustering algorithm to cluster data in a single dimension. The proposed algorithm provided significant performance improvements over the well-known k-means algorithm as well as deterministic results. We then proved the correctness of our algorithm by showing it yields the same results as the traditional k-means algorithm. Using artificial datasets with randomly generated data we empirically analyzed the runtime of the algorithm, observing a runtime of $O(n \log n)$ in the worst case; an improvement over other improved k-means algorithms with a time complexity of $O(n^2)$ \cite{b1}. We then applied the proposed algorithm to a real-world dataset with oceanic and atmospheric data. To better understand the results of our algorithm and the data it produced we visualized the clusters on a map of the Earth as well as a discrete stepped line graph. We were able to observe trends in the size and locations of clusters on the Earth depending on the time of year.
 
 A clear limitation of the proposed algorithm is that it can only be applied to data in a single dimension. Many datasets that benefit from clustering have a high-dimensionality. As such, a future improvement would be to extend the concepts used by the proposed algorithm to an algorithm that can be applied to high-dimensional data. A potential approach for this would be to generalize the concept of cluster borders to two or more dimensions using Voronoi diagrams, of which there exist efficient algorithms to compute and manipulate \cite{b10}.
 

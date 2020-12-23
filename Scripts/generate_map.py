@@ -6,6 +6,7 @@ import argparse
 import numpy as np
 import multiprocessing as mp
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
 from matplotlib import colors, cm
 import cartopy.crs as ccrs
 
@@ -59,7 +60,7 @@ def plot(data, variable, day, cmap, output_dir=None, ranges=None, k=None):
 
     ax = plt.axes(projection=ccrs.PlateCarree(), label=f"{title}-{day}")
     ax.set_title(title, fontsize=16)
-    c = plt.contourf(
+    plt.contourf(
         lons,
         lats,
         data,
@@ -71,9 +72,10 @@ def plot(data, variable, day, cmap, output_dir=None, ranges=None, k=None):
         corner_mask=CORNER_SMOOTHING,
     )
 
-    # Generate a discrete legend with specific values
-    # proxy = [plt.Rectangle((0, 0), 1, 1, fc=pc.get_facecolor()[0]) for pc in c.collections]
-    # ax.legend(proxy, c.levels)
+    # Draw a line on the equator
+    gl = ax.gridlines(crs=ccrs.PlateCarree(), linewidth=0.5, color='black', alpha=1, linestyle='-')
+    gl.xlines = False
+    gl.ylocator = mticker.FixedLocator([0])
 
     if k:
         textstr = f"k={k}"

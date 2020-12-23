@@ -1,5 +1,5 @@
 # Dataset
-Scripts/output
+ignore/
 *.json
 *.nc
 

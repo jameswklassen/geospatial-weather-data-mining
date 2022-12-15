@@ -2,6 +2,8 @@
 ignore/
 *.json
 *.nc
+Dataset/
+Data\ Visualizations/
 
 # Annoying LaTeX temp files
 *.log

@@ -4,11 +4,9 @@
 - [Example of visualization video](examples/_two_metre_temperature_30.mp4)
 - [Visualization of performance analysis](performance)
 
-**Note:** as there isn't enough space in our submission to include all visualizations, **please find supplemental materials [here](https://umanitoba-my.sharepoint.com/:f:/g/personal/loewent4_myumanitoba_ca/ErSyuuZR8AtNr6r5UH97I9QB4hOiCpsz2mECRm1mhPNkIw?email=Carson.Leung%40umanitoba.ca&e=u8cmby).**
-
 ## Overview
 
-Visualizations have been generated for with k values from 5-10. We visualize the data by creating a image snapshot for each day in 2019. We then compiled each image into a year-long video representation of the data ([example](map/k=7/two_metre_temperature/_two_metre_temperature_30.mp4)). To conserve space in our submission, we have only included the first image from every month (although these images can be easily regenerated)
+Visualizations have been generated for with k values from 5-10. We visualize the data by creating a image snapshot for each day in 2019. We then compiled each image into a year-long video representation of the data ([example](map/k=7/two_metre_temperature/_two_metre_temperature_30.mp4)).
 
 ## Types of visualizations
 

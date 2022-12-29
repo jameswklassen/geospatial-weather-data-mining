@@ -1,4 +1,4 @@
-# Geospatial Global Weather Cluster Data Mining
+# Geospatial Weather Data Mining
 
 Ryan Froese ([froeser5@myumanitoba.ca](mailto:froeser5@myumanitoba.ca))
 

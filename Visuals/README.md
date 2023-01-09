@@ -8,15 +8,15 @@ Visualizations have been generated with k values (number of clusters) from 5-10.
 
 ## Types of visualizations
 
-1. Map
+### Map
 
 ![Map Visualization Example](examples/map.png)
 
-1. Line graph
+### Line graph
 
 ![Line Visualization Example](examples/line.png)
 
-### Visualized variables
+## Visualized variables
 
 We ran the clustering algorithm on three different variables from the ERA5 dataset:
 
